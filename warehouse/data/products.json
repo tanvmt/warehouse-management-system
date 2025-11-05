@@ -1,0 +1,18 @@
+[
+    {
+      "productId": "LP-DELL",
+      "productName": "Laptop Dell"
+    },
+    {
+      "productId": "MS-LOGI",
+      "productName": "Chuột Logitech"
+    },
+    {
+      "productId": "KB-CO",
+      "productName": "Bàn phím cơ"
+    },
+    {
+      "productId": "MN-32",
+      "productName": "Màn hình 32in"
+    }
+  ]

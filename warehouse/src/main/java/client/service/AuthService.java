@@ -1,5 +1,7 @@
 package client.service;
 
+import common.protocol.Protocol;
+
 public class AuthService {
 
     private SocketService socketService;
@@ -16,7 +18,7 @@ public class AuthService {
             return false;
         }
 
-        String loginCommand = "LOGIN;" + username + ";" + password;
+        String loginCommand = Protocol.C_LOGIN + Protocol.DELIMITER + username + Protocol.DELIMITER + password;
         String response = socketService.sendRequest(loginCommand);
 
         if (response != null && response.startsWith("LOGIN_OK")) {
