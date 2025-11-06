@@ -9,12 +9,9 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox styleClass="root-pane" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.WarehouseController">
     <children>
@@ -22,10 +19,9 @@
       
         <SplitPane dividerPositions="0.35" VBox.vgrow="ALWAYS">
             <items>
-                <VBox minWidth="300.0" spacing="15.0">
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
+                <VBox styleClass="card" spacing="15.0">
+                    <Label styleClass="card-title" text="Thực hiện Giao dịch" />
+                    
                     <Label styleClass="field-label" text="Chọn Sản phẩm:" />
                     <ComboBox fx:id="productComboBox" maxWidth="Infinity" styleClass="combo-box" />
                     
@@ -33,22 +29,34 @@
                     <TextField fx:id="quantityField" styleClass="text-field" promptText="ví dụ: 10" />
                     
                     <HBox spacing="10.0">
-                        <Button onAction="#handleImportButton" styleClass="action-button-green" text="Nhập hàng" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-                        <Button onAction="#handleExportButton" styleClass="action-button-blue" text="Xuất hàng" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                        <Button onAction="#handleImportButton" styleClass="primary-button" text="Nhập hàng" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-plus-circle" />
+                           </graphic>
+                        </Button>
+                        <Button onAction="#handleExportButton" styleClass="secondary-button" text="Xuất hàng" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-minus-circle" />
+                           </graphic>
+                        </Button>
                     </HBox>
+                    
+                    <Label fx:id="statusLabel" managed="false" /> 
                     
                     <Label styleClass="field-label" text="Log Giao dịch (cá nhân):" />
                     <TextArea fx:id="logTextArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
                 </VBox>
-                
-                <VBox>
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
+               
+                <VBox styleClass="card" spacing="10.0">
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label styleClass="field-label" text="Tình trạng Tồn kho (Live)" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="refreshButton" onAction="#handleRefresh" styleClass="action-button-green" text="Làm mới" />
+                        <Label styleClass="card-title" text="Tình trạng Tồn kho (Live)" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="refreshButton" onAction="#handleRefresh" styleClass="primary-button" text="Làm mới">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-sync-alt" />
+                           </graphic>
+                        </Button>
                     </HBox>
+          
                     <TableView fx:id="inventoryTable" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="productNameCol" prefWidth="300.0" text="Tên Sản phẩm" />
@@ -57,6 +65,9 @@
                         <VBox.margin>
                             <Insets top="10.0" />
                         </VBox.margin>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
                     </TableView>
                 </VBox>
             </items>

@@ -1,22 +1,22 @@
-/* Nền chính của toàn bộ cửa sổ */
+/* Nền chính (thay gradient bằng màu xanh đậm) */
 .root-pane {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #005f73, #0a9396);
+    -fx-background-color: #003049; /* Đồng bộ với Navigation Pane */
 }
 
-/* Hộp VBox chứa form */
+/* Hộp VBox chứa form (thay nền mờ bằng nền trắng) */
 .login-box {
-    -fx-background-color: rgba(255, 255, 255, 0.9); /* Màu trắng hơi mờ */
-    -fx-padding: 30;
-    -fx-border-radius: 15;
-    -fx-background-radius: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 3);
+    -fx-background-color: #ffffff;
+    -fx-padding: 40;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 15, 0, 0, 5);
 }
 
 /* Tiêu đề "Đăng nhập Hệ thống" */
 .title-label {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #003049; /* Màu xanh đậm */
+    -fx-text-fill: #003049;
 }
 
 /* Các nhãn (IP Server, Tên đăng nhập...) */
@@ -24,51 +24,78 @@
     -fx-font-size: 14px;
     -fx-font-weight: 500;
     -fx-text-fill: #333;
-    -fx-padding: 0 0 -5 0; /* Đẩy nhãn gần ô text hơn */
+    -fx-padding: 0 0 -5 0;
     -fx-alignment: center-left;
-    -fx-max-width: infinity; /* Đảm bảo nhãn căn trái */
+    -fx-max-width: infinity;
+    -fx-graphic-text-gap: 8px; /* Khoảng cách cho icon */
 }
 
-/* Các ô nhập liệu */
+/* Các ô nhập liệu (đồng bộ với main.css) */
 .text-field {
     -fx-font-size: 14px;
-    -fx-background-color: #f0f4f8;
+    -fx-background-color: #f0f4f8; /* Nền xám nhạt */
     -fx-border-color: #ccc;
     -fx-border-width: 1;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-padding: 8;
+    -fx-padding: 10; /* Tăng padding */
+    -fx-transition: -fx-border-color 0.2s ease-in-out;
 }
 
-/* Hiệu ứng khi focus vào ô nhập liệu */
 .text-field:focused {
-    -fx-border-color: #0a9396; /* Màu xanh lá cây */
+    -fx-border-color: #0a9396;
     -fx-border-width: 2;
     -fx-background-color: #ffffff;
 }
 
-/* Nút đăng nhập */
+/* Nút đăng nhập (dùng style .primary-button từ main.css) */
 .login-button {
-    -fx-background-color: #0a9396; /* Màu xanh lá cây */
+    -fx-background-color: #0a9396;
     -fx-text-fill: white;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-padding: 10 20;
-    -fx-max-width: infinity; /* Nút rộng tối đa */
-    -fx-cursor: hand; /* Biểu tượng bàn tay khi di chuột */
+    -fx-padding: 12 20; /* Tăng padding */
+    -fx-max-width: infinity;
+    -fx-cursor: hand;
+    
+    /* === HIỆU ỨNG === */
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+    -fx-transition: -fx-background-color 0.3s ease-out, 
+                    -fx-effect 0.3s ease-out,
+                    -fx-scale-x 0.3s ease-out, 
+                    -fx-scale-y 0.3s ease-out;
 }
 
-/* Hiệu ứng khi di chuột qua nút */
 .login-button:hover {
-    -fx-background-color: #0077b6; /* Đổi màu xanh dương */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+    -fx-background-color: #0077b6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.login-button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-opacity: 0.9;
+}
+
+/* Icon bên trong nút login */
+.login-button .ikonli-font-icon {
+    -fx-fill: white;
 }
 
 /* Nhãn báo lỗi */
 .status-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #d90429; /* Màu đỏ */
+    -fx-text-fill: #d90429;
     -fx-font-weight: bold;
+}
+
+/* Icon trong Label */
+.field-label .ikonli-font-icon {
+    -fx-fill: #555;
+    -fx-font-size: 1.1em;
 }

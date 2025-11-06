@@ -3,19 +3,40 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox prefWidth="220.0" styleClass="navigation-pane" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.NavigationController">
     <children>
         <VBox>
-            <Button onAction="#loadWarehouseView" styleClass="navigation-button" text="Kho hàng" />
-            <Button onAction="#loadHistoryView" styleClass="navigation-button" text="Lịch sử Giao dịch" />
+            <Button onAction="#loadWarehouseView" styleClass="navigation-button" text="Kho hàng">
+               <graphic>
+                  <FontIcon iconLiteral="fas-warehouse" styleClass="nav-icon" />
+               </graphic>
+            </Button>
+            <Button onAction="#loadHistoryView" styleClass="navigation-button" text="Lịch sử Giao dịch">
+               <graphic>
+                  <FontIcon iconLiteral="fas-history" styleClass="nav-icon" />
+               </graphic>
+            </Button>
             
-            <Button fx:id="reportsButton" onAction="#loadReportsView" styleClass="navigation-button" text="Báo cáo" />
-            <Button fx:id="productMgmtButton" onAction="#loadProductMgmtView" styleClass="navigation-button" text="Quản lý Sản phẩm" />
+            <Button fx:id="reportsButton" onAction="#loadReportsView" styleClass="navigation-button" text="Báo cáo">
+               <graphic>
+                  <FontIcon iconLiteral="fas-chart-pie" styleClass="nav-icon" />
+               </graphic>
+            </Button>
+            <Button fx:id="productMgmtButton" onAction="#loadProductMgmtView" styleClass="navigation-button" text="Quản lý Sản phẩm">
+               <graphic>
+                  <FontIcon iconLiteral="fas-boxes" styleClass="nav-icon" />
+               </graphic>
+            </Button>
         </VBox>
         
         <Region VBox.vgrow="ALWAYS" />
         
-        <Button fx:id="logoutButton" onAction="#handleLogout" styleClass="logout-button" text="Đăng xuất" />
+        <Button fx:id="logoutButton" onAction="#handleLogout" styleClass="logout-button" text="Đăng xuất">
+            <graphic>
+                <FontIcon iconLiteral="fas-sign-out-alt" styleClass="nav-icon" />
+            </graphic>
+        </Button>
     </children>
 </VBox>

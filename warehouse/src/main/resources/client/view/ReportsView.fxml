@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
@@ -9,18 +10,21 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox spacing="20.0" styleClass="root-pane" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ReportsController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
     <children>
         <Label styleClass="title-label" text="Báo cáo Kho hàng" />
         
         <HBox spacing="20.0" VBox.vgrow="ALWAYS">
-            <VBox HBox.hgrow="ALWAYS">
-                <Label styleClass="field-label" text="Tỷ lệ Tồn kho Sản phẩm" />
-                <PieChart fx:id="inventoryPieChart" title="Tỷ lệ Tồn kho" />
+            <VBox styleClass="card" HBox.hgrow="ALWAYS">
+                <Label styleClass="card-title" text="Tỷ lệ Tồn kho Sản phẩm" />
+                <PieChart fx:id="inventoryPieChart" title="Tỷ lệ Tồn kho" VBox.vgrow="ALWAYS" />
             </VBox>
             
-            <VBox HBox.hgrow="ALWAYS">
-                <Label styleClass="field-label" text="Thống kê Nhập/Xuất trong ngày" />
-                <BarChart fx:id="activityBarChart" title="Hoạt động Nhập/Xuất">
+            <VBox styleClass="card" HBox.hgrow="ALWAYS">
+                <Label styleClass="card-title" text="Thống kê Nhập/Xuất trong ngày" />
+                <BarChart fx:id="activityBarChart" title="Hoạt động Nhập/Xuất" VBox.vgrow="ALWAYS">
                     <xAxis>
                         <CategoryAxis label="Hoạt động" />
                     </xAxis>

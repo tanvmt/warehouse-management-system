@@ -1,48 +1,44 @@
 package client.service;
 
-import common.protocol.Protocol;
+import com.group9.warehouse.grpc.LoginRequest;
+import com.group9.warehouse.grpc.LoginResponse;
 
 public class AuthService {
-
-    private SocketService socketService;
     private String errorMessage;
+    private GrpcClientService grpcService; 
 
     public AuthService() {
-        this.socketService = SocketService.getInstance();
+        this.grpcService = GrpcClientService.getInstance();
     }
 
     public boolean login(String ip, int port, String username, String password) {
-        boolean connected = socketService.connect(ip, port);
+        boolean connected = grpcService.connect(ip, port); 
         if (!connected) {
             this.errorMessage = "Lỗi: Không thể kết nối tới Server.";
             return false;
         }
 
-        String loginCommand = Protocol.C_LOGIN + Protocol.DELIMITER + username + Protocol.DELIMITER + password;
-        String response = socketService.sendRequest(loginCommand);
+        try {
+            LoginRequest request = LoginRequest.newBuilder()
+                    .setUsername(username)
+                    .setPassword(password)
+                    .build();
+            
+            LoginResponse response = grpcService.getStub().login(request);
 
-        if (response != null && response.startsWith("LOGIN_OK")) {
-            String[] parts = response.split(";");
-            String role = parts[1]; 
-
-            SessionManager.createSession(username, role);
-            return true; 
-
-        } else if (response != null) {
-            String errorMsg = "Lỗi không xác định";
-            if(response.contains(";")) {
-                 errorMsg = response.split(";", 2)[1];
+            if (response.getSuccess()) {
+                SessionManager.createSession(username, response.getRole());
+                return true;
+            } else {
+                this.errorMessage = "Đăng nhập thất bại: " + response.getMessage();
+                return false;
             }
-            this.errorMessage = "Đăng nhập thất bại: " + errorMsg;
-            return false; 
-
-        } else {
-            this.errorMessage = "Lỗi: Không nhận được phản hồi từ Server.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.errorMessage = "Lỗi gRPC: " + e.getMessage();
             return false;
         }
     }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    
+    public String getErrorMessage() { return errorMessage; }
 }

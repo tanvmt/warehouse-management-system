@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.group9.warehouse.grpc";
+option java_outer_classname = "WarehouseProto";
+
+service WarehouseService {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc GetProducts(EmptyRequest) returns (ProductListResponse) {}
+  rpc AddProduct(AddProductRequest) returns (ServiceResponse) {}
+  rpc GetInventory(EmptyRequest) returns (InventoryResponse) {}
+  rpc ImportProduct(TransactionRequest) returns (TransactionResponse) {}
+  rpc ExportProduct(TransactionRequest) returns (TransactionResponse) {}
+  rpc GetHistory(EmptyRequest) returns (HistoryResponse) {}
+}
+
+message EmptyRequest {}
+
+message Product {
+  string productId = 1;
+  string productName = 2;
+}
+
+message InventoryItem {
+  string productName = 1;
+  int32 quantity = 2;
+}
+
+message Transaction {
+    string timestamp = 1;
+    string clientName = 2;
+    string action = 3;
+    string product = 4;
+    int32 quantity = 5;
+    string result = 6;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2; 
+  string role = 3;   
+}
+
+message ProductListResponse {
+  repeated Product products = 1;
+}
+
+message AddProductRequest {
+  string productId = 1;
+  string productName = 2;
+}
+
+message ServiceResponse { 
+  bool success = 1;
+  string message = 2;
+}
+
+message InventoryResponse {
+  repeated InventoryItem items = 1;
+}
+
+message TransactionRequest {
+  string clientName = 1; 
+  string productId = 2; 
+  int32 quantity = 3;
+}
+
+message TransactionResponse {
+  bool success = 1;
+  string message = 2; 
+  int32 newQuantity = 3;
+}
+
+message HistoryResponse {
+  repeated Transaction transactions = 1;
+}

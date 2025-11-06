@@ -1,24 +1,27 @@
 package common.model;
 
+import javafx.beans.property.SimpleStringProperty;
+
 public class Product {
-    private String id;
-    private String name;
+    private final SimpleStringProperty productId;
+    private final SimpleStringProperty productName;
 
     public Product(String id, String name) {
-        this.id = id;
-        this.name = name;
+        this.productId = new SimpleStringProperty(id);
+        this.productName = new SimpleStringProperty(name);
     }
 
-    public String getId() {
-        return id;
+    public String getProductId() {
+        return productId.get();
+    }
+    public SimpleStringProperty productIdProperty() {
+        return productId;
     }
 
-    public String getName() {
-        return name;
+    public String getProductName() {
+        return productName.get();
     }
-
-    public void setName(String name) {
-        this.name = name;
+    public SimpleStringProperty productNameProperty() {
+        return productName;
     }
-    
 }

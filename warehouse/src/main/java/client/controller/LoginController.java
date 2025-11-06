@@ -1,7 +1,6 @@
 package client.controller;
 
 import client.service.AuthService;
-import client.service.SocketService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -54,9 +53,7 @@ public class LoginController {
             stage.setScene(new Scene(root));
             stage.show();
             
-            stage.setOnCloseRequest(e -> {
-                SocketService.getInstance().close();
-            });
+            
             
         } catch (IOException e) {
             e.printStackTrace();
