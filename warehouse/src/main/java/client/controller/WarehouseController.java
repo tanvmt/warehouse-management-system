@@ -10,6 +10,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WarehouseController {
     @FXML
@@ -31,6 +33,8 @@ public class WarehouseController {
 
     private GrpcClientService grpcClientService;
 
+    private Map<String, String> productNameToIdMap = new HashMap<>();
+
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
 
@@ -42,20 +46,27 @@ public class WarehouseController {
     }
 
     private void loadProducts() {
-        try {
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            ProductListResponse response = grpcClientService.getStub().getProducts(request);
+    try {
+        EmptyRequest request = EmptyRequest.newBuilder().build();
+        ProductListResponse response = grpcClientService.getStub().getProducts(request);
 
-            ObservableList<String> productNames = FXCollections.observableArrayList();
-            for (Product product : response.getProductsList()) {
-                productNames.add(product.getProductName());
-            }
-            productComboBox.setItems(productNames);
-            logTextArea.appendText("Products loaded successfully.\n");
-        } catch (Exception e) {
-            logTextArea.appendText("Error loading products: " + e.getMessage() + "\n");
+        ObservableList<String> productDisplayNames = FXCollections.observableArrayList();
+        productNameToIdMap.clear();
+
+        for (Product product : response.getProductsList()) {
+            String name = product.getProductName();
+            String id = product.getProductId();
+            
+            productDisplayNames.add(name); 
+            productNameToIdMap.put(name, id);
         }
+        
+        productComboBox.setItems(productDisplayNames); 
+        logTextArea.appendText("Products loaded successfully.\n");
+    } catch (Exception e) {
+        logTextArea.appendText("Error loading products: " + e.getMessage() + "\n");
     }
+}
 
     private void loadInventory() {
         try {
@@ -91,11 +102,13 @@ public class WarehouseController {
     }
     
     private void handleTransaction(boolean isImport) {
-        String selectedProduct = productComboBox.getValue();
-        if (selectedProduct == null) {
+        String selectedProductName = productComboBox.getValue();
+        if (selectedProductName == null) {
             statusLabel.setText("Vui lòng chọn sản phẩm.");
             return;
         }
+
+        String selectedProductId = productNameToIdMap.get(selectedProductName);
 
         int quantity;
         try {
@@ -112,7 +125,7 @@ public class WarehouseController {
         try {
             TransactionRequest request = TransactionRequest.newBuilder()
                 .setClientName(SessionManager.getUsername())
-                .setProductId(selectedProduct)
+                .setProductId(selectedProductId)
                 .setQuantity(quantity)
                 .build();
 
@@ -129,13 +142,13 @@ public class WarehouseController {
 
             if (response.getSuccess()) {
                 String logMsg = String.format("%s %d %s thành công. Tồn kho mới: %d.\n",
-                actionLog, quantity, selectedProduct, response.getNewQuantity());
+                actionLog, quantity, selectedProductName, response.getNewQuantity());
                 logTextArea.appendText(logMsg);
                 showStatus(logMsg, true);
                 loadInventory();
             } else{
                 String logMsg = String.format("%s %d %s thất bại: %s\n",
-                        actionLog, quantity, selectedProduct, response.getMessage());
+                        actionLog, quantity, selectedProductName, response.getMessage());
                 logTextArea.appendText(logMsg);
                 showStatus(logMsg, false);
             }

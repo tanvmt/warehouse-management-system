@@ -2,7 +2,7 @@
   {
     "productId": "MS-LOGI",
     "productName": "Chuột Logitech",
-    "quantity": 50
+    "quantity": 0
   },
   {
     "productId": "TN-04",
@@ -12,7 +12,7 @@
   {
     "productId": "MN-32",
     "productName": "Màn hình 32in",
-    "quantity": 10
+    "quantity": 30
   },
   {
     "productId": "LP-DELL",
@@ -22,6 +22,6 @@
   {
     "productId": "KB-CO",
     "productName": "Bàn phím cơ",
-    "quantity": 30
+    "quantity": 20
   }
 ]

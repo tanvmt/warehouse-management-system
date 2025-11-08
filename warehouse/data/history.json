@@ -1,5 +1,61 @@
 [
   {
+    "timestamp": "2025-11-09T00:44:27Z",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 40,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:44:17Z",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 50,
+    "result": "Failed (Không đủ hàng tồn kho)"
+  },
+  {
+    "timestamp": "2025-11-09T00:43:28Z",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:40:26Z",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Màn hình 32in",
+    "quantity": 20,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:39:48Z",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:37:24Z",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
+    "timestamp": "2025-11-09T00:24:32Z",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
     "timestamp": "2025-11-08T23:12:12Z",
     "clientName": "staff_B",
     "action": "IMPORT",
