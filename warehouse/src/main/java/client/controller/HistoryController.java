@@ -14,6 +14,11 @@ import client.service.GrpcClientService;
 import common.model.Transaction; 
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
+
 public class HistoryController {
 
     @FXML private Button refreshButton;
@@ -26,6 +31,10 @@ public class HistoryController {
     @FXML private TableColumn<Transaction, String> resultCol;
     
     private GrpcClientService grpcClientService;
+
+    private final DateTimeFormatter inputFormatter = DateTimeFormatter.ISO_DATE_TIME;
+    private final DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss 'ngày' dd/MM/yyyy");
+    private final ZoneId localZoneId = ZoneId.systemDefault();
 
     @FXML
     public void initialize() {
@@ -46,6 +55,19 @@ public class HistoryController {
         loadHistory();
     }
 
+    private String formatTimestamp(String isoTimestamp) {
+        try {
+            ZonedDateTime utcDateTime = ZonedDateTime.parse(isoTimestamp, inputFormatter);
+            
+            ZonedDateTime localDateTime = utcDateTime.withZoneSameInstant(localZoneId);
+            
+            return localDateTime.format(outputFormatter);
+        } catch (DateTimeParseException e) {
+            System.err.println("Lỗi parse ngày tháng: " + isoTimestamp + " - " + e.getMessage());
+            return isoTimestamp; 
+        }
+    }
+
     private void loadHistory() {
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
@@ -53,8 +75,10 @@ public class HistoryController {
 
             ObservableList<Transaction> transactions = FXCollections.observableArrayList();
             for (com.group9.warehouse.grpc.Transaction tx : response.getTransactionsList()) {
+                String formattedTimestamp = formatTimestamp(tx.getTimestamp());
+                
                 transactions.add(new Transaction(
-                        tx.getTimestamp(),
+                        formattedTimestamp,
                         tx.getClientName(),
                         tx.getAction(),
                         tx.getProduct(),
@@ -66,17 +90,5 @@ public class HistoryController {
         } catch (Exception e) {
             System.out.println("Error loading history: " + e.getMessage());
         }
-        
-        
-        // System.out.println("Đang tải lịch sử giao dịch...");
-        
-        // // --- DATA MẪU (để test UI) ---
-        // ObservableList<Transaction> demoData = FXCollections.observableArrayList(
-        //     new Transaction("2025-11-05 10:30:01", "staff_B", "NHAP", "Laptop Dell", 20, "OK"),
-        //     new Transaction("2025-11-05 10:30:05", "staff_C", "XUAT", "Chuột Logitech", 5, "OK"),
-        //     new Transaction("2025-11-05 10:30:08", "staff_C", "XUAT", "Bàn phím cơ", 50, "FAIL;Không đủ hàng")
-        // );
-        // historyTable.setItems(demoData);
-        // // --- HẾT DATA MẪU ---
     }
 }

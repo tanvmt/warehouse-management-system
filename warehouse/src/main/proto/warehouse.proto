@@ -12,9 +12,32 @@ service WarehouseService {
   rpc ImportProduct(TransactionRequest) returns (TransactionResponse) {}
   rpc ExportProduct(TransactionRequest) returns (TransactionResponse) {}
   rpc GetHistory(EmptyRequest) returns (HistoryResponse) {}
+  rpc GetUsers (EmptyRequest) returns (UserListResponse) {}
+  rpc AddUser (AddUserRequest) returns (ServiceResponse) {}
+  rpc DeleteUser (DeleteUserRequest) returns (ServiceResponse) {}
+
 }
 
 message EmptyRequest {}
+
+message User {
+  string username = 1;
+  string role = 2; 
+}
+
+message UserListResponse {
+  repeated User users = 1;
+}
+
+message AddUserRequest {
+  string username = 1;
+  string password = 2;
+  string role = 3; 
+}
+
+message DeleteUserRequest {
+  string username = 1;
+}
 
 message Product {
   string productId = 1;

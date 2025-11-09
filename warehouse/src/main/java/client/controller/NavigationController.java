@@ -1,7 +1,7 @@
 package client.controller;
 
 import client.service.SessionManager;
-import client.service.GrpcClientService; // <-- Thay thế SocketService
+import client.service.GrpcClientService;
 import javafx.scene.Parent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,10 +12,17 @@ import javafx.scene.control.Button;
 import java.io.IOException;
 
 public class NavigationController {
-    @FXML private Button reportsButton;
-    @FXML private Button productMgmtButton;
-    @FXML private Button logoutButton;
-
+    @FXML
+    private Button reportsButton;
+    @FXML
+    private Button productMgmtButton;
+    @FXML
+    private Button logoutButton;
+    @FXML
+    private Button dashboardButton;
+    @FXML
+    private Button userMgmtButton;
+    
     private static MainAppWindowController mainController;
 
     public static void setMainController(MainAppWindowController controller) {
@@ -24,12 +31,15 @@ public class NavigationController {
 
     @FXML
     public void initialize() {
-        // Logic này giữ nguyên
         boolean isManager = SessionManager.isManager();
         reportsButton.setVisible(isManager);
         reportsButton.setManaged(isManager);
         productMgmtButton.setVisible(isManager);
         productMgmtButton.setManaged(isManager);
+        dashboardButton.setVisible(isManager);
+        dashboardButton.setManaged(isManager);
+        userMgmtButton.setVisible(isManager);
+        userMgmtButton.setManaged(isManager);
     }
 
     @FXML private void loadWarehouseView() {
@@ -43,6 +53,12 @@ public class NavigationController {
     }
     @FXML private void loadProductMgmtView() {
         mainController.loadView("/client/view/ProductManagerClientView.fxml");
+    }
+    @FXML private void loadDashboardView() {
+        mainController.loadView("/client/view/DashboardView.fxml");
+    }
+    @FXML private void loadUserMgmtView() {
+        mainController.loadView("/client/view/UserManagementView.fxml");
     }
     
     @FXML

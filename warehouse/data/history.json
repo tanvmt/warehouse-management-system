@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2025-11-09T22:18:35Z",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Chuột Logitech",
+    "quantity": 20,
+    "result": "Success"
+  },
+  {
     "timestamp": "2025-11-09T00:44:27Z",
     "clientName": "manager_A",
     "action": "EXPORT",

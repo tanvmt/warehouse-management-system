@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.control.Button?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox styleClass="root-pane" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+             <Label styleClass="title-label" text="Tổng quan Dashboard" HBox.hgrow="ALWAYS" />
+             <Button fx:id="refreshButton" onAction="#handleRefresh" styleClass="primary-button" text="Làm mới">
+                 <graphic>
+                     <FontIcon iconLiteral="fas-sync-alt" />
+                 </graphic>
+             </Button>
+        </HBox>
+      
+        <GridPane hgap="20" vgap="20" styleClass="kpi-grid-pane">
+            <padding>
+                <Insets top="10.0" />
+            </padding>
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" />
+                <ColumnConstraints hgrow="ALWAYS" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+            
+            <HBox styleClass="kpi-card" GridPane.columnIndex="0">
+                <children>
+                    <FontIcon iconLiteral="fas-boxes" styleClass="kpi-icon" />
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label fx:id="totalProductsLabel" text="0" styleClass="kpi-number-label" />
+                        <Label text="Tổng loại sản phẩm" styleClass="kpi-title-label" />
+                    </VBox>
+                </children>
+            </HBox>
+            
+            <HBox styleClass="kpi-card" GridPane.columnIndex="1">
+                <children>
+                    <FontIcon iconLiteral="fas-warehouse" styleClass="kpi-icon" />
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label fx:id="totalStockLabel" text="0" styleClass="kpi-number-label" />
+                        <Label text="Tổng số lượng tồn kho" styleClass="kpi-title-label" />
+                    </VBox>
+                </children>
+            </HBox>
+            
+            <HBox styleClass="kpi-card" GridPane.columnIndex="2">
+                <children>
+                    <FontIcon iconLiteral="fas-users" styleClass="kpi-icon" />
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label fx:id="totalUsersLabel" text="0" styleClass="kpi-number-label" />
+                        <Label text="Tổng số người dùng" styleClass="kpi-title-label" />
+                    </VBox>
+                </children>
+            </HBox>
+        </GridPane>
+
+        <SplitPane dividerPositions="0.4" VBox.vgrow="ALWAYS">
+            <items>
+                <VBox styleClass="card" spacing="10.0">
+                    <Label styleClass="card-title" text="Cảnh báo: Sắp hết hàng" />
+                    <Label text="Các sản phẩm có số lượng tồn kho 10 hoặc ít hơn." />
+                    <ListView fx:id="lowStockListView" styleClass="dashboard-list-view" VBox.vgrow="ALWAYS" />
+                </VBox>
+                
+                <VBox styleClass="card" spacing="10.0">
+                    <Label styleClass="card-title" text="Hoạt động Gần đây" />
+                    <Label text="5 giao dịch mới nhất trên toàn hệ thống." />
+                    <ListView fx:id="recentActivityListView" styleClass="dashboard-list-view" VBox.vgrow="ALWAYS" />
+                </VBox>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>

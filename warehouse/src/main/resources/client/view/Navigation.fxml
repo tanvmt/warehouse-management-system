@@ -8,6 +8,11 @@
 <VBox prefWidth="220.0" styleClass="navigation-pane" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.NavigationController">
     <children>
         <VBox>
+            <Button fx:id="dashboardButton" onAction="#loadDashboardView" styleClass="navigation-button" text="Dashboard">
+               <graphic>
+                  <FontIcon iconLiteral="fas-tachometer-alt" styleClass="nav-icon" />
+               </graphic>
+            </Button>
             <Button onAction="#loadWarehouseView" styleClass="navigation-button" text="Kho hàng">
                <graphic>
                   <FontIcon iconLiteral="fas-warehouse" styleClass="nav-icon" />
@@ -18,10 +23,14 @@
                   <FontIcon iconLiteral="fas-history" styleClass="nav-icon" />
                </graphic>
             </Button>
-            
             <Button fx:id="reportsButton" onAction="#loadReportsView" styleClass="navigation-button" text="Báo cáo">
                <graphic>
                   <FontIcon iconLiteral="fas-chart-pie" styleClass="nav-icon" />
+               </graphic>
+            </Button>
+            <Button fx:id="userMgmtButton" onAction="#loadUserMgmtView" styleClass="navigation-button" text="Quản lý User">
+               <graphic>
+                  <FontIcon iconLiteral="fas-users-cog" styleClass="nav-icon" />
                </graphic>
             </Button>
             <Button fx:id="productMgmtButton" onAction="#loadProductMgmtView" styleClass="navigation-button" text="Quản lý Sản phẩm">
