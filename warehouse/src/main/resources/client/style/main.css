@@ -2,8 +2,26 @@
  * GLOBAL STYLES (Styles Chung)
  *==================================================*/
 
- .root-pane {
+ @font-face {
+    -fx-font-family: 'Inter';
+    -fx-font-weight: normal; /* 400 */
+    src: url('warehouse/src/main/java/client/fonts/Inter_24pt-Regular.ttf');
+}
+@font-face {
+    -fx-font-family: 'Inter';
+    -fx-font-weight: 500; /* Medium */
+    src: url('warehouse/src/main/java/client/fonts/Inter_24pt-Medium.ttf');
+}
+@font-face {
+    -fx-font-family: 'Inter';
+    -fx-font-weight: bold; /* 700 */
+    src: url('warehouse/src/main/java/client/fonts/Inter_24pt-Bold.ttf');
+}
+
+.root-pane {
+    -fx-font-family: 'Inter', 'Segoe UI', system-ui;
     -fx-background-color: #f0f4f8; 
+    -fx-font-smoothing-type: lcd;
 }
 
 .card {
@@ -281,7 +299,7 @@
 }
 
 /*==================================================
- * SPLIT PANE FIX (Làm "clean" như trang Báo cáo)
+ * SPLIT PANE FIX 
  *==================================================*/
 
 /* 1. Ẩn viền/nền của khung SplitPane bên ngoài */
@@ -308,3 +326,65 @@
 .split-pane .split-pane-divider .grip {
      -fx-background-color: transparent;
 }
+
+/* Hộp chứa các thẻ KPI */
+.kpi-grid-pane {
+    -fx-padding: 0 0 10 0;
+}
+
+/* Thẻ KPI (Tổng quan) */
+.kpi-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 15, 0, 0, 4);
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 15.0;
+}
+
+.kpi-icon {
+    -fx-font-size: 32px; /* Kích thước icon */
+    -fx-fill: #0a9396;   /* Màu xanh chủ đạo */
+    -fx-opacity: 0.8;
+}
+
+/* Số liệu KPI (to, rõ) */
+.kpi-number-label {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0a9396; /* Màu xanh chính */
+    -fx-padding: 0 0 5 0;
+}
+
+/* Tiêu đề của KPI */
+.kpi-title-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #003049; /* Màu xanh đậm */
+}
+
+
+
+/* Tùy chỉnh cho ListView (dùng trong Dashboard) */
+.dashboard-list-view {
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* Tùy chỉnh màu cho các mục sắp hết hàng */
+.list-cell:filled:selected {
+    -fx-background-color: #0a9396;
+    -fx-text-fill: white;
+}
+
+/* Style cho các mục sắp hết hàng (quan trọng) */
+.low-stock-cell {
+    -fx-text-fill: #d90429; /* Màu đỏ lỗi */
+    -fx-font-weight: bold;
+}
+
+.low-stock-cell:filled:selected {
+    -fx-text-fill: white;
+}
+

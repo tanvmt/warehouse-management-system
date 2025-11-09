@@ -10,6 +10,11 @@ import client.service.GrpcClientService;
 import com.group9.warehouse.grpc.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ReportsController {
 
@@ -26,16 +31,6 @@ public class ReportsController {
     }
 
     private void loadPieChartData() {
-        // // TODO: Lấy dữ liệu từ "GET_INVENTORY"
-        // // Đây là data mẫu
-        // ObservableList<PieChart.Data> pieChartData =
-        //         FXCollections.observableArrayList(
-        //                 new PieChart.Data("Laptop Dell", 90),
-        //                 new PieChart.Data("Chuột Logitech", 490),
-        //                 new PieChart.Data("Bàn phím cơ", 150));
-        
-        // inventoryPieChart.setData(pieChartData);
-
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
             InventoryResponse response = grpcClientService.getStub().getInventory(request);
@@ -52,20 +47,6 @@ public class ReportsController {
     }
     
     private void loadBarChartData() {
-        // // TODO: Lấy dữ liệu từ "GET_HISTORY"
-        // // Đây là data mẫu
-        // XYChart.Series series1 = new XYChart.Series();
-        // series1.setName("Nhập");
-        // series1.getData().add(new XYChart.Data("Laptop", 50));
-        // series1.getData().add(new XYChart.Data("Chuột", 200));
-
-        // XYChart.Series series2 = new XYChart.Series();
-        // series2.setName("Xuất");
-        // series2.getData().add(new XYChart.Data("Laptop", 20));
-        // series2.getData().add(new XYChart.Data("Chuột", 80));
-
-        // activityBarChart.getData().addAll(series1, series2);
-
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
             HistoryResponse response = grpcClientService.getStub().getHistory(request);
@@ -74,11 +55,11 @@ public class ReportsController {
             Map<String, Double> exportMap = new HashMap<>();
 
             for (Transaction tx : response.getTransactionsList()) {
-                if (tx.getResult().equals("OK")) {
-                    if (tx.getAction().equals("NHAP")) {
+                if (tx.getResult().startsWith("Success")) {
+                    if (tx.getAction().equals("NHAP") || tx.getAction().equals("IMPORT")) {
                         importMap.put(tx.getProduct(),
                                 importMap.getOrDefault(tx.getProduct(), 0.0) + tx.getQuantity());
-                    } else if (tx.getAction().equals("XUAT")) {
+                    } else if (tx.getAction().equals("XUAT") || tx.getAction().equals("EXPORT")) {
                         exportMap.put(tx.getProduct(),
                                 exportMap.getOrDefault(tx.getProduct(), 0.0) + tx.getQuantity());
                     }
@@ -87,14 +68,22 @@ public class ReportsController {
 
             XYChart.Series<String, Number> importSeries = new XYChart.Series<>();
             importSeries.setName("Nhập");
-            for (Map.Entry<String, Double> entry : importMap.entrySet()) {
-                importSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-            }
 
             XYChart.Series<String, Number> exportSeries = new XYChart.Series<>();
             exportSeries.setName("Xuất");
-            for (Map.Entry<String, Double> entry : exportMap.entrySet()) {
-                exportSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+
+            Set<String> allProductNames = new HashSet<>(importMap.keySet());
+            allProductNames.addAll(exportMap.keySet());
+
+            List<String> sortedProducts = new ArrayList<>(allProductNames);
+            Collections.sort(sortedProducts);
+            
+            for (String productName : sortedProducts) {
+                double importQty = importMap.getOrDefault(productName, 0.0);
+                importSeries.getData().add(new XYChart.Data<>(productName, importQty));
+                
+                double exportQty = exportMap.getOrDefault(productName, 0.0);
+                exportSeries.getData().add(new XYChart.Data<>(productName, exportQty));
             }
 
             activityBarChart.getData().clear();

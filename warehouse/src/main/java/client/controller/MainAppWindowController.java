@@ -21,7 +21,7 @@ public class MainAppWindowController {
 
         NavigationController.setMainController(this);
 
-        loadView("/client/view/WarehouseView.fxml");
+        loadView("/client/view/DashboardView.fxml");
     }
 
     public void loadView(String fxmlPath) {
