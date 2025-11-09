@@ -18,9 +18,14 @@ public class ClientApp extends Application {
          FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/Login.fxml"));
 //        FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/MainAppWindow.fxml"));
         Parent root = loader.load();
+        Scene scene = new Scene(root); // 1. Tạo đối tượng Scene
+
+        // 2. Lấy đường dẫn CSS và áp dụng vào Scene
+        String cssPath = getClass().getResource("/client/style/main.css").toExternalForm();
+        scene.getStylesheets().add(cssPath);
 
         primaryStage.setTitle("Warehouse Management System - Login");
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(scene); // 3. Sử dụng Scene đã được thêm CSS
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(e -> {

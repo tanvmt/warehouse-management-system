@@ -5,17 +5,17 @@
  @font-face {
     -fx-font-family: 'Inter';
     -fx-font-weight: normal; /* 400 */
-    src: url('warehouse/src/main/java/client/fonts/Inter_24pt-Regular.ttf');
+    src: url('/client/fonts/Inter_24pt-Regular.ttf');
 }
 @font-face {
     -fx-font-family: 'Inter';
     -fx-font-weight: 500; /* Medium */
-    src: url('warehouse/src/main/java/client/fonts/Inter_24pt-Medium.ttf');
+    src: url('/client/fonts/Inter_24pt-Medium.ttf');
 }
 @font-face {
     -fx-font-family: 'Inter';
     -fx-font-weight: bold; /* 700 */
-    src: url('warehouse/src/main/java/client/fonts/Inter_24pt-Bold.ttf');
+    src: url('/client/fonts/Inter_24pt-Bold.ttf');
 }
 
 .root-pane {

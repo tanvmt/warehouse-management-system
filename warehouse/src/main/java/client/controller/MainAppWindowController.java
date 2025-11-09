@@ -3,7 +3,7 @@ package client.controller;
 import client.service.SessionManager;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.Node;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 
@@ -26,7 +26,7 @@ public class MainAppWindowController {
 
     public void loadView(String fxmlPath) {
         try {
-            Pane view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Node view = FXMLLoader.load(getClass().getResource(fxmlPath));
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
             e.printStackTrace();
