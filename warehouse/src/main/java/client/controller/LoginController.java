@@ -35,7 +35,8 @@ public class LoginController {
         String password = passwordField.getText().trim();
         int port = 9090; 
 
-        boolean loginSuccess = new AuthService().login(ip, port, username, password);
+        boolean loginSuccess = this.authService.login(ip, port, username, password);
+        System.out.println("Login success: " + loginSuccess);
         if (loginSuccess) {
             System.out.print("Đăng nhập thành công");
             statusLabel.setText("Đăng nhập thành công!");
@@ -43,6 +44,7 @@ public class LoginController {
             ipField.getScene().getWindow().hide();
         } else {
             String errorMsg = authService.getErrorMessage();
+            System.out.print("Đăng nhập thất bại: " + errorMsg);
             statusLabel.setText(errorMsg);
         }
     }

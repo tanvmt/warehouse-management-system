@@ -3,10 +3,12 @@ package client.service;
 public class SessionManager {
     private static String username;
     private static String role;
+    private static String authToken;
 
-    public static void createSession(String user, String userRole) {
+    public static void createSession(String user, String userRole, String token) {
         username = user;
         role = userRole;
+        authToken = token;
     }
 
     public static String getUsername() {
@@ -17,6 +19,10 @@ public class SessionManager {
         return role;
     }
 
+    public static String getToken() {
+        return authToken;
+    }
+
     public static boolean isManager() {
         return "Manager".equals(role);
     }
@@ -24,5 +30,6 @@ public class SessionManager {
     public static void clearSession() {
         username = null;
         role = null;
+        authToken = null;
     }
 }

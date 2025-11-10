@@ -10,7 +10,12 @@ import server.service.AuthService;
 import java.util.Objects;
 import java.util.Set;
 
+import org.slf4j.Logger; // Thêm import này
+import org.slf4j.LoggerFactory; // Thêm import này
+
 public class AuthInterceptor implements ServerInterceptor {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthInterceptor.class);
 
     // Metadata key để client gửi token lên
     public static final Metadata.Key<String> AUTH_TOKEN_KEY =
@@ -22,17 +27,17 @@ public class AuthInterceptor implements ServerInterceptor {
 
     // Danh sách các hàm KHÔNG cần đăng nhập
     private static final Set<String> PUBLIC_METHODS = Set.of(
-            "com.group9.warehouse.grpc.AuthService/Login"
+            "AuthService/Login"
     );
 
     // Danh sách các hàm CHỈ Manager được dùng
     private static final Set<String> MANAGER_METHODS = Set.of(
-            "com.group9.warehouse.grpc.UserManagementService/GetUsers",
-            "com.group9.warehouse.grpc.UserManagementService/AddUser",
-            "com.group9.warehouse.grpc.UserManagementService/SetUserActiveStatus",
-            "com.group9.warehouse.grpc.ProductManagementService/AddProduct",
-            "com.group9.warehouse.grpc.ProductManagementService/UpdateProduct",
-            "com.group9.warehouse.grpc.ProductManagementService/SetProductActiveStatus"
+            "UserManagementService/GetUsers",
+            "UserManagementService/AddUser",
+            "UserManagementService/SetUserActiveStatus",
+            "ProductManagementService/AddProduct",
+            "ProductManagementService/UpdateProduct",
+            "ProductManagementService/SetProductActiveStatus"
     );
 
     @Override
@@ -42,6 +47,7 @@ public class AuthInterceptor implements ServerInterceptor {
             ServerCallHandler<ReqT, RespT> next) {
 
         String methodName = call.getMethodDescriptor().getFullMethodName();
+        logger.info("Intercepting call to: {}", methodName);
 
         // 1. Cho phép truy cập public (Login)
         if (PUBLIC_METHODS.contains(methodName)) {
