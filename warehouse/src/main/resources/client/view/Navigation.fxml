@@ -41,7 +41,11 @@
         </VBox>
         
         <Region VBox.vgrow="ALWAYS" />
-        
+        <Button fx:id="profileButton" onAction="#loadProfileView" styleClass="navigation-button" text="Hồ sơ cá nhân">
+            <graphic>
+                <FontIcon iconLiteral="fas-user-circle" styleClass="nav-icon" />
+            </graphic>
+        </Button>
         <Button fx:id="logoutButton" onAction="#handleLogout" styleClass="logout-button" text="Đăng xuất">
             <graphic>
                 <FontIcon iconLiteral="fas-sign-out-alt" styleClass="nav-icon" />

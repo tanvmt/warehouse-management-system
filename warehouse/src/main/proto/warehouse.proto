@@ -15,7 +15,10 @@ service WarehouseService {
   rpc GetUsers (EmptyRequest) returns (UserListResponse) {}
   rpc AddUser (AddUserRequest) returns (ServiceResponse) {}
   rpc DeleteUser (DeleteUserRequest) returns (ServiceResponse) {}
-
+  rpc GetUserProfile(GetProfileRequest) returns (ProfileResponse);
+  rpc UpdateUserProfile(UpdateProfileRequest) returns (ProfileResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ProfileResponse);
+  rpc SetUserActiveStatus(SetUserActiveRequest) returns (ProfileResponse);
 }
 
 message EmptyRequest {}
@@ -37,6 +40,42 @@ message AddUserRequest {
 
 message DeleteUserRequest {
   string username = 1;
+}
+
+message UserProfile {
+    string username = 1;
+    string role = 2;
+    string fullName = 3;
+    string email = 4;
+    string phone = 5;
+    string sex = 6;
+    string dateOfBirth = 7; 
+    bool isActive = 8;
+}
+
+message GetProfileRequest {
+    string username = 1;
+}
+
+message UpdateProfileRequest {
+    UserProfile profile = 1;
+}
+
+message ChangePasswordRequest {
+    string username = 1;
+    string oldPassword = 2;
+    string newPassword = 3;
+}
+
+message ProfileResponse {
+    bool success = 1;
+    string message = 2;
+    UserProfile profile = 3;
+}
+
+message SetUserActiveRequest {
+    string username = 1;
+    bool isActive = 2;
 }
 
 message Product {

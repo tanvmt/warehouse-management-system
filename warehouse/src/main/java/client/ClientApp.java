@@ -14,9 +14,9 @@ import client.service.SessionManager;
 public class ClientApp extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
-//        SessionManager.createSession("test", "Manager"); // Tạo session giả để test giao diện
-         FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/Login.fxml"));
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/MainAppWindow.fxml"));
+       SessionManager.createSession("test", "Manager"); // Tạo session giả để test giao diện
+        //  FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/Login.fxml"));
+       FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/MainAppWindow.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root); // 1. Tạo đối tượng Scene
 
