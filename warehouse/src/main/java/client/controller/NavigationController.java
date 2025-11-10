@@ -22,6 +22,8 @@ public class NavigationController {
     private Button dashboardButton;
     @FXML
     private Button userMgmtButton;
+    @FXML
+    private Button profileButton;
     
     private static MainAppWindowController mainController;
 
@@ -61,6 +63,9 @@ public class NavigationController {
         mainController.loadView("/client/view/UserManagementView.fxml");
     }
     
+    @FXML private void loadProfileView() {
+        mainController.loadView("/client/view/ProfileView.fxml");
+    }
     @FXML
     private void handleLogout() {
         try{

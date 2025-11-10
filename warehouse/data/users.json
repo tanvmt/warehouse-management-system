@@ -2,23 +2,47 @@
     "users": [
       {
         "username": "manager_A",
-        "password": "adminpass",
-        "role": "Manager"
+        "hashedPassword": "$2a$10$EXAMPLE...HASH_FOR_adminpass",
+        "role": "Manager",
+        "fullName": "Trần Văn Quản Lý",
+        "email": "manager_a@company.com",
+        "phone": "0901234567",
+        "sex": "Nam",
+        "dateofbirth": "1990-05-15",
+        "isActive": true
       },
       {
         "username": "staff_B",
-        "password": "user123",
-        "role": "Staff"
+        "hashedPassword": "$2a$10$EXAMPLE...HASH_FOR_user123",
+        "role": "Staff",
+        "fullName": "Nguyễn Thị B",
+        "email": "staff_b@company.com",
+        "phone": "0907654321",
+        "sex": "Nữ",
+        "dateofbirth": "1995-10-20",
+        "isActive": true
       },
       {
         "username": "staff_C",
-        "password": "user123",
-        "role": "Staff"
+        "hashedPassword": "$2a$10$EXAMPLE...HASH_FOR_user123",
+        "role": "Staff",
+        "fullName": "Lê Văn C",
+        "email": "staff_c@company.com",
+        "phone": "0912345678",
+        "sex": "Nam",
+        "dateofbirth": "1998-02-10",
+        "isActive": false
       },
       {
         "username": "staff_D",
-        "password": "user123",
-        "role": "Staff"
+        "hashedPassword": "$2a$10$EXAMPLE...HASH_FOR_user123",
+        "role": "Staff",
+        "fullName": "Phạm Thị D",
+        "email": "staff_d@company.com",
+        "phone": "0987654321",
+        "sex": "Nữ",
+        "dateofbirth": "2000-11-30",
+        "isActive": true
       }
     ]
   }
