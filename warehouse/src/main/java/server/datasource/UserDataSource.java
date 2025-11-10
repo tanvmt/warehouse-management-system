@@ -1,14 +1,13 @@
 package server.datasource;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import server.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 public class UserDataSource {
 
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger log = LoggerFactory.getLogger(UserDataSource.class);
     private final String USERS_FILE = "data/users.json";
 
@@ -34,6 +34,15 @@ public class UserDataSource {
         } catch (FileNotFoundException e) {
             log.error("Không tìm thấy file {}. Trả về danh sách rỗng.", USERS_FILE, e);
             return Collections.emptyList();
+        }
+    }
+
+    public void saveUsers(List<User> users) {
+        try (Writer writer = new FileWriter(USERS_FILE)) {
+            gson.toJson(users, writer);
+            log.info("Luu vao file user thanh cong!!!");
+        } catch (Exception e) {
+            log.error("Lỗi khi lưu file user: " + e.getMessage());
         }
     }
 

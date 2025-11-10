@@ -3,6 +3,8 @@ package server.datasource;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.model.Transaction;
 
 import java.io.FileReader;
@@ -17,15 +19,16 @@ public class TransactionDataSource {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final String TRANSACTION_FILE = "data/history.json";
+    private static final Logger log = LoggerFactory.getLogger(TransactionDataSource.class);
 
     public List<Transaction> loadTransactions() {
         try (Reader reader = new FileReader(TRANSACTION_FILE)) {
             Type type = new TypeToken<List<Transaction>>() {}.getType();
             List<Transaction> transactions = gson.fromJson(reader, type);
-            System.out.println("TransactionDataSource: Đã tải " + (transactions != null ? transactions.size() : 0) + " giao dịch.");
+            log.info("TransactionDataSource: Đã tải {} giao dịch.", transactions != null ? transactions.size() : 0);
             return transactions != null ? transactions : new ArrayList<>();
         } catch (Exception e) {
-            System.err.println("Không tìm thấy file " + TRANSACTION_FILE + ", trả về danh sách rỗng.");
+            log.error("Không tìm thấy file  {} , trả về danh sách rỗng.", TRANSACTION_FILE);
             return new ArrayList<>();
         }
     }
@@ -33,8 +36,9 @@ public class TransactionDataSource {
     public void saveTransactions(List<Transaction> transactions) {
         try (Writer writer = new FileWriter(TRANSACTION_FILE)) {
             gson.toJson(transactions, writer);
+            log.info("Luu vao file giao dich thanh cong");
         } catch (Exception e) {
-            System.err.println("Lỗi khi lưu file giao dịch: " + e.getMessage());
+            log.error("Lỗi khi lưu file giao dịch: {}", e.getMessage());
         }
     }
 }

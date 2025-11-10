@@ -56,11 +56,11 @@ public class UserManagementController {
     private void loadUserList() {
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
-            UserListResponse response = grpcClientService.getStub().getUsers(request);
+            UserListResponse response = grpcClientService.getStub().GetUsers(request);
 
             ObservableList<User> users = FXCollections.observableArrayList();
-            for (com.group9.warehouse.grpc.User u : response.getUsersList()) {
-                users.add(new User(u.getUsername(), u.getRole()));
+            for (com.group9.warehouse.grpc.UserProfile u : response.getUsersList()) {
+                users.add(new User(u.getUsername(), u.getRole(), true));
             }
 
             usersTable.setItems(users);
