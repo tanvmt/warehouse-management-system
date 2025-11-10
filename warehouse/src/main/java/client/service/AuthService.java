@@ -11,7 +11,7 @@ public class AuthService {
 
     public AuthService() {
         this.grpcService = GrpcClientService.getInstance();
-        this.authStub = grpcService.getAuthStub();
+        // this.authStub = grpcService.getAuthStub();
     }
 
     public boolean login(String ip, int port, String username, String password) {
@@ -22,6 +22,7 @@ public class AuthService {
         }
 
         try {
+            AuthServiceGrpc.AuthServiceBlockingStub authStub = grpcService.getAuthStub();
             LoginRequest request = LoginRequest.newBuilder()
                     .setUsername(username)
                     .setPassword(password)
@@ -30,7 +31,8 @@ public class AuthService {
             LoginResponse response = authStub.login(request);
 
             if (response.getSuccess()) {
-                SessionManager.createSession(username, response.getRole());
+                String token = response.getToken();
+                SessionManager.createSession(username, response.getRole(), token);
                 return true;
             } else {
                 this.errorMessage = "Đăng nhập thất bại: " + response.getMessage();
