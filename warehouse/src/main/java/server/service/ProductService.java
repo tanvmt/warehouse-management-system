@@ -1,111 +1,23 @@
 package server.service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import server.model.Product; // <-- SỬ DỤNG MODEL CỦA SERVER
+import com.group9.warehouse.grpc.GetProductsRequest;
+import com.group9.warehouse.grpc.PaginationInfo;
+import com.group9.warehouse.grpc.ProductListResponse;
+import server.model.Product;
+import server.repository.ProductRepository;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProductService {
 
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String PRODUCTS_FILE = "data/products.json";
-    private final Map<String, Product> productDatabase; // Key là ProductID
+    private final ProductRepository productRepository;
 
-    public ProductService() {
-        this.productDatabase = loadProducts();
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
-    private Map<String, Product> loadProducts() {
-        try (Reader reader = new FileReader(PRODUCTS_FILE)) {
-            Type productListType = new TypeToken<List<Product>>() {}.getType();
-            List<Product> productList = gson.fromJson(reader, productListType);
-            System.out.println("ProductService: Đã tải " + productList.size() + " sản phẩm.");
-            return productList.stream()
-                    .collect(Collectors.toConcurrentMap(Product::getProductId, product -> product));
-        } catch (Exception e) {
-            System.err.println("Lỗi: Không tìm thấy file " + PRODUCTS_FILE);
-            return new ConcurrentHashMap<>();
-        }
-    }
-
-    private synchronized void saveProducts() {
-        try (Writer writer = new FileWriter(PRODUCTS_FILE)) {
-            gson.toJson(new ArrayList<>(productDatabase.values()), writer);
-        } catch (IOException e) {
-            System.err.println("Lỗi khi lưu file sản phẩm: " + e.getMessage());
-        }
-    }
-
-    public List<Product> getAllProducts() {
-        return new ArrayList<>(productDatabase.values());
-    }
-
-    public Optional<Product> getProductById(String productId) {
-        return Optional.ofNullable(productDatabase.get(productId));
-    }
-
-    public synchronized boolean addProduct(String productId, String productName) {
-        if (productDatabase.containsKey(productId)) {
-            return false; // Đã tồn tại
-        }
-        // Tạo POJO mới
-        Product newProduct = new Product(productId, productName, 0);
-        productDatabase.put(productId, newProduct);
-        saveProducts();
-        return true;
-    }
-
-
-    public synchronized TransactionResponse importProduct(String productId, int quantity) {
-        if (quantity <= 0) {
-            return new TransactionResponse(false, "Số lượng phải lớn hơn 0", -1);
-        }
-
-        Product product = productDatabase.get(productId);
-        if (product == null) {
-            return new TransactionResponse(false, "Sản phẩm không tồn tại", -1);
-        }
-
-        product.setQuantity(product.getQuantity() + quantity);
-        saveProducts(); // Lưu lại file
-        return new TransactionResponse(true, "Nhập hàng thành công", product.getQuantity());
-    }
-
-    public synchronized TransactionResponse exportProduct(String productId, int quantity) {
-        if (quantity <= 0) {
-            return new TransactionResponse(false, "Số lượng phải lớn hơn 0", -1);
-        }
-
-        Product product = productDatabase.get(productId);
-        if (product == null) {
-            return new TransactionResponse(false, "Sản phẩm không tồn tại", -1);
-        }
-
-        if (product.getQuantity() < quantity) {
-            return new TransactionResponse(false, "Không đủ hàng tồn kho", product.getQuantity());
-        }
-
-        product.setQuantity(product.getQuantity() - quantity);
-        saveProducts(); // Lưu lại file
-        return new TransactionResponse(true, "Xuất hàng thành công", product.getQuantity());
-    }
-
-    // Lớp nội bộ tiện ích
+    // Gói kết quả của Transaction
     public static class TransactionResponse {
         public final boolean success;
         public final String message;
@@ -118,4 +30,120 @@ public class ProductService {
         }
     }
 
+    // --- Logic Quản lý (Manager) ---
+
+    public boolean addProduct(String productId, String productName) {
+        if (productRepository.existsById(productId)) {
+            return false; // Trùng ID
+        }
+        Product newProduct = new Product(productId, productName, 0, true); // Mặc định active, 0 tồn kho
+        return productRepository.save(newProduct);
+    }
+
+    public boolean updateProduct(String productId, String newProductName) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isEmpty()) {
+            return false; // Không tìm thấy
+        }
+        Product product = productOptional.get();
+        product.setProductName(newProductName);
+        return productRepository.update(product);
+    }
+
+    public boolean setProductActiveStatus(String productId, boolean isActive) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isEmpty()) {
+            return false;
+        }
+        Product product = productOptional.get();
+        product.setActive(isActive);
+        return productRepository.update(product);
+    }
+
+    // --- Logic Kho (Staff) ---
+
+    public ProductListResponse getPaginatedProducts(GetProductsRequest request) {
+        int page = request.getPage() <= 0 ? 1 : request.getPage();
+        int pageSize = request.getPageSize() <= 0 ? 10 : request.getPageSize();
+        String searchTerm = request.getSearchTerm();
+        Boolean isActive = request.hasIsActive() ? request.getIsActive().getValue() : null;
+
+        List<Product> products = productRepository.getPaginatedProducts(searchTerm, isActive, page, pageSize);
+        long totalElements = productRepository.countProducts(searchTerm, isActive);
+        long totalPages = (long) Math.ceil((double) totalElements / pageSize);
+
+        PaginationInfo pagination = PaginationInfo.newBuilder()
+                .setPageNumber(page)
+                .setPageSize(pageSize)
+                .setTotalElements(totalElements)
+                .setTotalPages((int) totalPages)
+                .build();
+
+        ProductListResponse.Builder responseBuilder = ProductListResponse.newBuilder();
+        responseBuilder.setPagination(pagination);
+
+        // Convert model Product -> gRPC Product
+        for (Product p : products) {
+            responseBuilder.addProducts(
+                    com.group9.warehouse.grpc.Product.newBuilder()
+                            .setProductId(p.getProductId())
+                            .setProductName(p.getProductName())
+                            .setIsActive(p.isActive())
+                            .build()
+            );
+        }
+
+        return responseBuilder.build();
+    }
+
+    public Optional<Product> getProductById(String productId) {
+        return productRepository.findById(productId);
+    }
+
+    public List<Product> getAllProducts() {
+        // (Hàm này có thể dùng cho GetInventory)
+        return productRepository.getPaginatedProducts(null, true, 1, 1000); // Tạm thời lấy 1000 sp active
+    }
+
+    public synchronized TransactionResponse importProduct(String productId, int quantity) {
+        if (quantity <= 0) {
+            return new TransactionResponse(false, "Số lượng phải > 0", -1);
+        }
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isEmpty()) {
+            return new TransactionResponse(false, "Sản phẩm không tồn tại", -1);
+        }
+
+        Product product = productOptional.get();
+        if (!product.isActive()) {
+            return new TransactionResponse(false, "Sản phẩm đã bị khóa", product.getQuantity());
+        }
+
+        product.setQuantity(product.getQuantity() + quantity);
+        productRepository.update(product); // Lưu
+        return new TransactionResponse(true, "Nhập thành công", product.getQuantity());
+    }
+
+    public synchronized TransactionResponse exportProduct(String productId, int quantity) {
+        if (quantity <= 0) {
+            return new TransactionResponse(false, "Số lượng phải > 0", -1);
+        }
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isEmpty()) {
+            return new TransactionResponse(false, "Sản phẩm không tồn tại", -1);
+        }
+
+        Product product = productOptional.get();
+        if (!product.isActive()) {
+            return new TransactionResponse(false, "Sản phẩm đã bị khóa", product.getQuantity());
+        }
+
+        if (product.getQuantity() < quantity) {
+            return new TransactionResponse(false, "Không đủ hàng tồn kho", product.getQuantity());
+        }
+
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.update(product); // Lưu
+        return new TransactionResponse(true, "Xuất thành công", product.getQuantity());
+    }
 }

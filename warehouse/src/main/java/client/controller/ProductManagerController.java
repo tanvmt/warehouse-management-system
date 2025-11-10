@@ -9,9 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import common.model.Product;
-
-import java.security.Provider.Service;
+import client.model.Product;
 
 import com.group9.warehouse.grpc.*;
 

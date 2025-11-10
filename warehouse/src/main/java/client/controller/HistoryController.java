@@ -11,7 +11,7 @@ import com.group9.warehouse.grpc.EmptyRequest;
 import com.group9.warehouse.grpc.HistoryResponse;
 
 import client.service.GrpcClientService;
-import common.model.Transaction; 
+import client.model.Transaction;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.time.ZonedDateTime;

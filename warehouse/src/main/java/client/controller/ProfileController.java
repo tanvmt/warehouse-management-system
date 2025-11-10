@@ -2,7 +2,7 @@ package client.controller;
 
 import client.service.GrpcClientService;
 import client.service.SessionManager;
-import common.model.UserProfile;
+import client.model.UserProfile;
 import com.group9.warehouse.grpc.*; 
 import com.group9.warehouse.grpc.WarehouseServiceGrpc.WarehouseServiceBlockingStub;
 

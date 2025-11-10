@@ -3,7 +3,7 @@ package client.controller;
 import client.service.GrpcClientService;
 import client.service.SessionManager;
 import com.group9.warehouse.grpc.*; 
-import common.model.InventoryItem;
+import client.model.InventoryItem;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

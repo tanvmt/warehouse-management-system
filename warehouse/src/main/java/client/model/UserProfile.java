@@ -1,4 +1,4 @@
-package common.model;
+package client.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,7 +23,7 @@ public class UserProfile {
         this.sex = sex;
         setDateOfBirth(dateOfBirthStr);
     }
-    
+
     public UserProfile() {}
 
     // Getters

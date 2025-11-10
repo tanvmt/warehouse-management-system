@@ -16,7 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import client.service.GrpcClientService;
 import com.group9.warehouse.grpc.*;
-import common.model.Transaction;
+import client.model.Transaction;
 import client.util.PdfGenerator;
 
 import java.io.File;

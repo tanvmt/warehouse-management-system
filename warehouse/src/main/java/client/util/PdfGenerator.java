@@ -1,7 +1,6 @@
 package client.util;
 
-import common.model.Transaction;
-import com.itextpdf.io.font.constants.StandardFonts;
+import client.model.Transaction;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;

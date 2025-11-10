@@ -1,53 +1,96 @@
 package server.service;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.group9.warehouse.grpc.UpdateProfileRequest;
+import org.mindrot.jbcrypt.BCrypt;
 import server.model.User;
+import server.repository.UserRepository;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AuthService {
 
-    private List<User> userDatabase;
-    private final String USERS_FILE = "data/users.json";
-    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+    // Đây là bí mật, không được hardcode. Nên đọc từ file config.
+    public static final String JWT_SECRET = "DayLaMotBiMatRatRatLao";
+    public static final Algorithm JWT_ALGORITHM = Algorithm.HMAC256(JWT_SECRET);
 
-    public AuthService() {
-        try {
-            loadUsers();
-        } catch (FileNotFoundException e) {
-            log.error("Lỗi: Không tìm thấy file {}. Tạo danh sách rỗng.", USERS_FILE, e);
-            this.userDatabase = List.of();
-        }
+    private final UserRepository userRepository;
+
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    private void loadUsers() throws FileNotFoundException {
-        Gson gson = new Gson();
-        Reader reader = new FileReader(USERS_FILE);
+    // Logic đăng nhập MỚI
+    public Optional<User> validateUser(String username, String plainPassword) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
 
-        Type userListType = new TypeToken<Map<String, List<User>>>() {}.getType();
-        Map<String, List<User>> userMap = gson.fromJson(reader, userListType);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
 
-        this.userDatabase = userMap.get("users");
-        log.info("AuthService: Đã tải {} người dùng.", this.userDatabase.size());
+            // 1. Kiểm tra tài khoản có bị khóa không
+            if (!user.isActive()) {
+                System.out.println("Đăng nhập thất bại: Tài khoản " + username + " đã bị khóa.");
+                return Optional.empty();
+            }
+
+            // 2. Kiểm tra mật khẩu
+            if (BCrypt.checkpw(plainPassword, user.getHashedPassword())) {
+                return userOptional; // Thành công
+            }
+        }
+        return Optional.empty(); // Sai tên hoặc sai pass
     }
 
-    public Optional<User> validateUser(String username, String password) {
-        if (username == null || password == null) {
+    public String generateJwtToken(User user) {
+        long EXPIRATION_TIME_MS = 86_400_000; // 1 ngày
+        return JWT.create()
+                .withSubject(user.getUsername())
+                .withClaim("role", user.getRole())
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
+                .sign(JWT_ALGORITHM);
+    }
 
-            return Optional.empty();
+    // --- Logic Profile MỚI ---
+
+    public Optional<User> getUserProfile(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public boolean updateUserProfile(String username, UpdateProfileRequest request) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            return false;
         }
-        return userDatabase.stream()
-                .filter(user -> user.getUsername().equals(username) && user.getPassword().equals(password))
-                .findFirst();
+        User user = userOptional.get();
+        // Cập nhật các trường
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setSex(request.getSex());
+        user.setDateOfBirth(request.getDateOfBirth());
+
+        return userRepository.update(user); // Lưu thay đổi
+    }
+
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+        User user = userOptional.get();
+
+        // Kiểm tra pass cũ
+        if (!BCrypt.checkpw(oldPassword, user.getHashedPassword())) {
+            return false; // Mật khẩu cũ không đúng
+        }
+
+        // Băm và set pass mới
+        String newHashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        user.setHashedPassword(newHashedPassword);
+
+        return userRepository.update(user); // Lưu thay đổi
     }
 }
