@@ -32,11 +32,13 @@ public class WarehouseController {
     private Label statusLabel;
 
     private GrpcClientService grpcClientService;
+    private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
 
     private Map<String, String> productNameToIdMap = new HashMap<>();
 
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
+        warehouseStub = grpcClientService.getWarehouseStub();
 
         productNameCol.setCellValueFactory(new PropertyValueFactory<>("productName"));
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
@@ -47,8 +49,11 @@ public class WarehouseController {
 
     private void loadProducts() {
     try {
-        EmptyRequest request = EmptyRequest.newBuilder().build();
-        ProductListResponse response = grpcClientService.getStub().getProducts(request);
+        GetProductsRequest request = GetProductsRequest.newBuilder()
+            .setPage(1)
+            .setPageSize(100)
+            .build();
+        ProductListResponse response = warehouseStub.getProducts(request);
 
         ObservableList<String> productDisplayNames = FXCollections.observableArrayList();
         productNameToIdMap.clear();
@@ -71,7 +76,7 @@ public class WarehouseController {
     private void loadInventory() {
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
-            InventoryResponse response = grpcClientService.getStub().getInventory(request);
+            InventoryResponse response = warehouseStub.getInventory(request);
 
             ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
             for (com.group9.warehouse.grpc.InventoryItem item : response.getItemsList()) {
@@ -124,7 +129,6 @@ public class WarehouseController {
     
         try {
             TransactionRequest request = TransactionRequest.newBuilder()
-                .setClientName(SessionManager.getUsername())
                 .setProductId(selectedProductId)
                 .setQuantity(quantity)
                 .build();
@@ -133,10 +137,10 @@ public class WarehouseController {
             String actionLog;
 
             if (isImport) {
-                response = grpcClientService.getStub().importProduct(request);
+                response = warehouseStub.importProduct(request);
                 actionLog = "NHẬP";
             } else {
-                response = grpcClientService.getStub().exportProduct(request);
+                response = warehouseStub.exportProduct(request);
                 actionLog = "XUẤT";
             }
 

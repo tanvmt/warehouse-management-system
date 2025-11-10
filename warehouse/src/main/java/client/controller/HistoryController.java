@@ -8,7 +8,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import com.group9.warehouse.grpc.EmptyRequest;
+import com.group9.warehouse.grpc.GetHistoryRequest;
 import com.group9.warehouse.grpc.HistoryResponse;
+import com.group9.warehouse.grpc.WarehouseServiceGrpc;
 
 import client.service.GrpcClientService;
 import client.model.Transaction;
@@ -31,6 +33,7 @@ public class HistoryController {
     @FXML private TableColumn<Transaction, String> resultCol;
     
     private GrpcClientService grpcClientService;
+    private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
 
     private final DateTimeFormatter inputFormatter = DateTimeFormatter.ISO_DATE_TIME;
     private final DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss 'ngày' dd/MM/yyyy");
@@ -39,6 +42,7 @@ public class HistoryController {
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
+        warehouseStub = grpcClientService.getWarehouseStub();
 
         timestampCol.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
         clientNameCol.setCellValueFactory(new PropertyValueFactory<>("clientName"));
@@ -70,8 +74,11 @@ public class HistoryController {
 
     private void loadHistory() {
         try {
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            HistoryResponse response = grpcClientService.getStub().getHistory(request);
+            GetHistoryRequest request = GetHistoryRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(50)
+                .build();
+            HistoryResponse response = warehouseStub.getHistory(request);
 
             ObservableList<Transaction> transactions = FXCollections.observableArrayList();
             for (com.group9.warehouse.grpc.Transaction tx : response.getTransactionsList()) {

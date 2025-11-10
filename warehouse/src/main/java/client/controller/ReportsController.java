@@ -53,6 +53,7 @@ public class ReportsController {
     @FXML private TableColumn<Transaction, String> resultCol;
 
     private GrpcClientService grpcClientService;
+    private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
 
     // Dùng để parse ngày tháng từ server
     private final DateTimeFormatter isoFormatter = DateTimeFormatter.ISO_DATE_TIME;
@@ -62,6 +63,7 @@ public class ReportsController {
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
+        warehouseStub = grpcClientService.getWarehouseStub();
         
         setupHistoryTable();
 
@@ -130,7 +132,7 @@ public class ReportsController {
     private void loadPieChartData() {
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
-            InventoryResponse response = grpcClientService.getStub().getInventory(request);
+            InventoryResponse response = warehouseStub.getInventory(request);
 
             ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
             for (InventoryItem item : response.getItemsList()) {
@@ -150,8 +152,11 @@ public class ReportsController {
             ZonedDateTime startDateTime = startDate.atStartOfDay(localZoneId);
             ZonedDateTime endDateTime = endDate.atTime(LocalTime.MAX).atZone(localZoneId);
 
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            HistoryResponse response = grpcClientService.getStub().getHistory(request);
+            GetHistoryRequest request = GetHistoryRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(1000) 
+                .build();
+            HistoryResponse response = warehouseStub.getHistory(request);
 
             List<Transaction> filteredList = response.getTransactionsList().stream()
                 .map(tx -> {

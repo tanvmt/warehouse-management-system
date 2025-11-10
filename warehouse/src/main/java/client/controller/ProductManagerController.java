@@ -32,10 +32,14 @@ public class ProductManagerController {
     // @FXML private Button deleteButton; // Bỏ comment nếu bạn thêm chức năng xóa
 
     private GrpcClientService grpcClientService;
+    private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
+    private ProductManagementServiceGrpc.ProductManagementServiceBlockingStub productStub;
 
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
+        warehouseStub = grpcClientService.getWarehouseStub();
+        productStub = grpcClientService.getProductStub();
 
         productIdCol.setCellValueFactory(new PropertyValueFactory<>("productId"));
         productNameCol.setCellValueFactory(new PropertyValueFactory<>("productName"));
@@ -50,8 +54,12 @@ public class ProductManagerController {
 
     private void loadProductList() {
         try {
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            ProductListResponse response = grpcClientService.getStub().getProducts(request);
+            GetProductsRequest request = GetProductsRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(100)
+                .build();
+            ProductListResponse response = warehouseStub.getProducts(request);
+            
 
             ObservableList<Product> products = FXCollections.observableArrayList();
             for (com.group9.warehouse.grpc.Product p : response.getProductsList()) {
@@ -81,7 +89,7 @@ public class ProductManagerController {
                     .setProductName(name)
                     .build();
 
-            ServiceResponse response = grpcClientService.getStub().addProduct(request);
+            ServiceResponse response = productStub.addProduct(request);
 
             if (response.getSuccess()) {
                 addStatusLabel.setText("Thêm sản phẩm thành công: " + name);

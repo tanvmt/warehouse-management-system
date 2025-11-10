@@ -1,13 +1,16 @@
 package client.service;
 
-import com.group9.warehouse.grpc.WarehouseServiceGrpc;
+import com.group9.warehouse.grpc.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 public class GrpcClientService {
     private static GrpcClientService instance;
     private ManagedChannel channel;
-    private WarehouseServiceGrpc.WarehouseServiceBlockingStub blockingStub;
+    private AuthServiceGrpc.AuthServiceBlockingStub authStub;
+    private UserManagementServiceGrpc.UserManagementServiceBlockingStub userStub;
+    private ProductManagementServiceGrpc.ProductManagementServiceBlockingStub productStub;
+    private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
 
     private GrpcClientService() {}
 
@@ -24,7 +27,10 @@ public class GrpcClientService {
                 channel = ManagedChannelBuilder.forAddress(ip, port)
                         .usePlaintext()
                         .build();
-                blockingStub = WarehouseServiceGrpc.newBlockingStub(channel);
+                authStub = AuthServiceGrpc.newBlockingStub(channel);
+                userStub = UserManagementServiceGrpc.newBlockingStub(channel);
+                productStub = ProductManagementServiceGrpc.newBlockingStub(channel);
+                warehouseStub = WarehouseServiceGrpc.newBlockingStub(channel);
             }
             return true;
         } catch (Exception e) {
@@ -33,14 +39,25 @@ public class GrpcClientService {
         }
     }
     
-    public WarehouseServiceGrpc.WarehouseServiceBlockingStub getStub() {
-        return blockingStub;
+    public AuthServiceGrpc.AuthServiceBlockingStub getAuthStub() {
+        return authStub;
+    }
+    
+    public UserManagementServiceGrpc.UserManagementServiceBlockingStub getUserStub() {
+        return userStub;
+    }
+    
+    public ProductManagementServiceGrpc.ProductManagementServiceBlockingStub getProductStub() {
+        return productStub;
+    }
+    
+    public WarehouseServiceGrpc.WarehouseServiceBlockingStub getWarehouseStub() {
+        return warehouseStub;
     }
 
     public void close() {
         if (channel != null) {
             channel.shutdown();
         }
-        instance = null;
     }
 }

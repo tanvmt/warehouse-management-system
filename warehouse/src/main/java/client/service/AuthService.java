@@ -2,13 +2,16 @@ package client.service;
 
 import com.group9.warehouse.grpc.LoginRequest;
 import com.group9.warehouse.grpc.LoginResponse;
+import com.group9.warehouse.grpc.AuthServiceGrpc;
 
 public class AuthService {
     private String errorMessage;
     private GrpcClientService grpcService;
+    private AuthServiceGrpc.AuthServiceBlockingStub authStub;
 
     public AuthService() {
         this.grpcService = GrpcClientService.getInstance();
+        this.authStub = grpcService.getAuthStub();
     }
 
     public boolean login(String ip, int port, String username, String password) {
@@ -24,7 +27,7 @@ public class AuthService {
                     .setPassword(password)
                     .build();
             
-            LoginResponse response = grpcService.getStub().login(request);
+            LoginResponse response = authStub.login(request);
 
             if (response.getSuccess()) {
                 SessionManager.createSession(username, response.getRole());

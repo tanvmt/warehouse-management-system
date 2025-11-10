@@ -22,11 +22,15 @@ public class DashboardController {
     @FXML private ListView<String> recentActivityListView;
 
     private GrpcClientService grpcClientService;
+    private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
+    private UserManagementServiceGrpc.UserManagementServiceBlockingStub userStub;
 
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
-        
+        warehouseStub = grpcClientService.getWarehouseStub();
+        userStub = grpcClientService.getUserStub();
+
         lowStockListView.setCellFactory(lv -> new ListCell<String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -63,7 +67,7 @@ public class DashboardController {
     private void loadInventoryAndKpiData() {
         try {
             EmptyRequest request = EmptyRequest.newBuilder().build();
-            InventoryResponse response = grpcClientService.getStub().getInventory(request);
+            InventoryResponse response = warehouseStub.getInventory(request);
 
             int totalProducts = 0;
             int totalStock = 0;
@@ -92,8 +96,11 @@ public class DashboardController {
 
     private void loadUserKpiData() {
         try {
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            UserListResponse response = grpcClientService.getStub().getUsers(request);
+            GetUsersRequest request = GetUsersRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(1)
+                .build();
+            UserListResponse response = userStub.getUsers(request);
             
             int totalUsers = response.getUsersList().size();
             totalUsersLabel.setText(String.valueOf(totalUsers));
@@ -106,8 +113,11 @@ public class DashboardController {
 
     private void loadRecentActivityData() {
         try {
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            HistoryResponse response = grpcClientService.getStub().getHistory(request);
+            GetHistoryRequest request = GetHistoryRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(5)
+                .build();
+            HistoryResponse response = warehouseStub.getHistory(request);
             
             ObservableList<String> recentActivities = FXCollections.observableArrayList();
             

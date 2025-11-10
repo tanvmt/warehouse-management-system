@@ -3,8 +3,10 @@ package client.controller;
 import client.service.GrpcClientService;
 import client.service.SessionManager;
 import client.model.UserProfile;
+
+import com.google.protobuf.Empty;
+import com.google.rpc.context.AttributeContext.Auth;
 import com.group9.warehouse.grpc.*; 
-import com.group9.warehouse.grpc.WarehouseServiceGrpc.WarehouseServiceBlockingStub;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -35,14 +37,16 @@ public class ProfileController implements Initializable {
     @FXML private PasswordField pfConfirmPassword;
     @FXML private Label lblPasswordStatus;
 
-    private WarehouseServiceBlockingStub blockingStub;
+    private GrpcClientService grpcClientService;
+    private AuthServiceGrpc.AuthServiceBlockingStub authStub;
     private UserProfile currentUserProfile;
     private boolean isEditing = false;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.blockingStub = GrpcClientService.getInstance().getStub();
+        grpcClientService = GrpcClientService.getInstance();
+        authStub = grpcClientService.getAuthStub();
         cbSex.setItems(FXCollections.observableArrayList("Nam", "Nữ", "Khác"));
         loadUserProfileData();
         setFieldsEditable(false);
@@ -56,11 +60,9 @@ public class ProfileController implements Initializable {
                 return;
             }
 
-            GetProfileRequest request = GetProfileRequest.newBuilder()
-                    .setUsername(username)
-                    .build();
+            EmptyRequest request = EmptyRequest.newBuilder().build();
 
-            ProfileResponse response = blockingStub.getUserProfile(request);
+            ProfileResponse response = authStub.getUserProfile(request);
 
             if (response.getSuccess() && response.hasProfile()) {
                 this.currentUserProfile = convertGrpcToLocalProfile(response.getProfile());
@@ -106,10 +108,14 @@ public class ProfileController implements Initializable {
                 updatedProfile.setDateOfBirth(dpDateOfBirth.getValue());
                 
                 UpdateProfileRequest request = UpdateProfileRequest.newBuilder()
-                    .setProfile(convertLocalToGrpcProfile(updatedProfile))
-                    .build();
+                        .setFullName(tfFullName.getText())
+                        .setEmail(tfEmail.getText())
+                        .setPhone(tfPhone.getText())
+                        .setSex(cbSex.getValue() != null ? cbSex.getValue() : "")
+                        .setDateOfBirth(dpDateOfBirth.getValue() != null ? dpDateOfBirth.getValue().format(DATE_FORMATTER) : "")
+                        .build();
 
-                ProfileResponse response = blockingStub.updateUserProfile(request);
+                ServiceResponse response = authStub.updateUserProfile(request);
 
                 if (response.getSuccess()) {
                     this.currentUserProfile = updatedProfile;
@@ -159,12 +165,11 @@ public class ProfileController implements Initializable {
             String username = SessionManager.getUsername();
 
             ChangePasswordRequest request = ChangePasswordRequest.newBuilder()
-                    .setUsername(username)
                     .setOldPassword(oldPass)
                     .setNewPassword(newPass)
                     .build();
             
-            ProfileResponse response = blockingStub.changePassword(request);
+            ServiceResponse response = authStub.changePassword(request);
 
             if (response.getSuccess()) {
                 setStatusLabel(lblPasswordStatus, "Đổi mật khẩu thành công!", true);

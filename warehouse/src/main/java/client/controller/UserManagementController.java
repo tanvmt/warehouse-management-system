@@ -35,10 +35,12 @@ public class UserManagementController {
     @FXML private Button deleteButton;
 
     private GrpcClientService grpcClientService;
+    private UserManagementServiceGrpc.UserManagementServiceBlockingStub userManagementStub;
 
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
+        userManagementStub = grpcClientService.getUserStub();
 
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         roleCol.setCellValueFactory(new PropertyValueFactory<>("role"));
@@ -55,8 +57,11 @@ public class UserManagementController {
 
     private void loadUserList() {
         try {
-            EmptyRequest request = EmptyRequest.newBuilder().build();
-            UserListResponse response = grpcClientService.getStub().GetUsers(request);
+            GetUsersRequest request = GetUsersRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(100)
+                .build();
+            UserListResponse response = userManagementStub.getUsers(request);
 
             ObservableList<User> users = FXCollections.observableArrayList();
             for (com.group9.warehouse.grpc.UserProfile u : response.getUsersList()) {
@@ -88,7 +93,7 @@ public class UserManagementController {
                     .setRole(role)
                     .build();
 
-            ServiceResponse response = grpcClientService.getStub().addUser(request);
+            ServiceResponse response = userManagementStub.addUser(request);
 
             if (response.getSuccess()) {
                 showStatus("Thêm user " + username + " thành công!", true);
@@ -102,37 +107,37 @@ public class UserManagementController {
         }
     }
 
-    @FXML
-    private void handleDeleteUser() {
-        User selectedUser = usersTable.getSelectionModel().getSelectedItem();
+    // @FXML
+    // private void handleDeleteUser() {
+    //     User selectedUser = usersTable.getSelectionModel().getSelectedItem();
         
-        if (selectedUser == null) {
-            showStatus("Vui lòng chọn một người dùng để xóa.", false);
-            return;
-        }
+    //     if (selectedUser == null) {
+    //         showStatus("Vui lòng chọn một người dùng để xóa.", false);
+    //         return;
+    //     }
 
-        if (selectedUser.getUsername().equals(client.service.SessionManager.getUsername())) {
-             showStatus("Lỗi: Bạn không thể tự xóa chính mình.", false);
-             return;
-        }
+    //     if (selectedUser.getUsername().equals(client.service.SessionManager.getUsername())) {
+    //          showStatus("Lỗi: Bạn không thể tự xóa chính mình.", false);
+    //          return;
+    //     }
 
-        try {
-            DeleteUserRequest request = DeleteUserRequest.newBuilder()
-                    .setUsername(selectedUser.getUsername())
-                    .build();
+    //     try {
+    //         DeleteUserRequest request = DeleteUserRequest.newBuilder()
+    //                 .setUsername(selectedUser.getUsername())
+    //                 .build();
             
-            ServiceResponse response = grpcClientService.getStub().deleteUser(request);
+    //         ServiceResponse response = grpcClientService.getStub().deleteUser(request);
 
-            if (response.getSuccess()) {
-                showStatus("Xóa user " + selectedUser.getUsername() + " thành công.", true);
-                loadUserList();
-            } else {
-                showStatus("Lỗi xóa user: " + response.getMessage(), false);
-            }
-        } catch (Exception e) {
-            showStatus("Lỗi gRPC: " + e.getMessage(), false);
-        }
-    }
+    //         if (response.getSuccess()) {
+    //             showStatus("Xóa user " + selectedUser.getUsername() + " thành công.", true);
+    //             loadUserList();
+    //         } else {
+    //             showStatus("Lỗi xóa user: " + response.getMessage(), false);
+    //         }
+    //     } catch (Exception e) {
+    //         showStatus("Lỗi gRPC: " + e.getMessage(), false);
+    //     }
+    // }
 
     private void clearForm() {
         usernameField.clear();
