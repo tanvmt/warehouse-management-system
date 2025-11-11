@@ -2,7 +2,7 @@
   "users": [
     {
       "username": "manager_A",
-      "hashedPassword": "$2a$10$IVwYBd0ENIi3rH69IjWC5uZVMzGk2VCwhdt2vq6NlXCiIhD.kgpt6",
+      "hashedPassword": "$2a$10$uCUQdIUBotUMbS.HshmiY.pSeykYKG1DJQQH.M5a/ZZ7JeLFC3px6",
       "role": "Manager",
       "fullName": "Trần Văn Quản Lý",
       "email": "manager_a@company.com",

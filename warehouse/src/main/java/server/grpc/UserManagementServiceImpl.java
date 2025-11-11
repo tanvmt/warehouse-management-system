@@ -4,7 +4,6 @@ import com.group9.warehouse.grpc.*;
 import io.grpc.stub.StreamObserver;
 import server.service.UserService;
 
-// Quan trọng: extends UserManagementServiceGrpc...
 public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserManagementServiceImplBase {
 
     private final UserService userService;
@@ -12,8 +11,6 @@ public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserMan
     public UserManagementServiceImpl(UserService userService) {
         this.userService = userService;
     }
-
-    // Lưu ý: Interceptor đã check quyền Manager cho các hàm này.
 
     @Override
     public void getUsers(GetUsersRequest request, StreamObserver<UserListResponse> responseObserver) {

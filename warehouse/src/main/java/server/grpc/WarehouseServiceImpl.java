@@ -5,12 +5,10 @@ import server.interceptor.AuthInterceptor;
 import server.model.Product;
 import io.grpc.stub.StreamObserver;
 import server.service.ProductService;
-import server.model.Transaction;
 import server.service.TransactionService;
 
 import java.util.List;
 
-// Quan trọng: extends WarehouseServiceGrpc... (file base này đã thay đổi)
 public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceImplBase {
 
     private final ProductService productService;
@@ -22,12 +20,8 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
         this.transactionService = transactionService;
     }
 
-    // Xóa Login, AddUser, GetUsers...
-    // Xóa AddProduct
-
     @Override
     public void getProducts(GetProductsRequest request, StreamObserver<ProductListResponse> responseObserver) {
-        // Gọi hàm service mới
         ProductListResponse response = productService.getPaginatedProducts(request);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -36,7 +30,6 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
     @Override
     public void getInventory(EmptyRequest request, StreamObserver<InventoryResponse> responseObserver) {
         InventoryResponse.Builder response = InventoryResponse.newBuilder();
-        // Chỉ lấy các sp đang active để hiển thị tồn kho
         List<Product> products = productService.getAllProducts();
 
         for (Product product : products) {
@@ -44,7 +37,7 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
                     InventoryItem.newBuilder()
                             .setProductName(product.getProductName())
                             .setQuantity(product.getQuantity())
-                            .setIsActive(product.isActive()) // Thêm trạng thái
+                            .setIsActive(product.isActive())
                             .build();
             response.addItems(item);
         }
@@ -54,7 +47,6 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
 
     @Override
     public void importProduct(TransactionRequest request, StreamObserver<TransactionResponse> responseObserver) {
-        // Lấy username từ Context (do Interceptor thêm vào)
         String clientName = AuthInterceptor.USERNAME_CONTEXT_KEY.get();
 
         ProductService.TransactionResponse result = productService.importProduct(
@@ -69,7 +61,7 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
         String logResult = result.success ? "Success" : "Failed (" + result.message + ")";
 
         transactionService.logTransaction(
-                clientName, // <-- Lấy từ Token
+                clientName,
                 "IMPORT",
                 productName,
                 request.getQuantity(),
@@ -101,7 +93,7 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
         String logResult = result.success ? "Success" : "Failed (" + result.message + ")";
 
         transactionService.logTransaction(
-                clientName, // <-- Lấy từ Token
+                clientName,
                 "EXPORT",
                 productName,
                 request.getQuantity(),
@@ -120,7 +112,6 @@ public class WarehouseServiceImpl extends WarehouseServiceGrpc.WarehouseServiceI
 
     @Override
     public void getHistory(GetHistoryRequest request, StreamObserver<HistoryResponse> responseObserver) {
-        // Gọi hàm service mới
         HistoryResponse response = transactionService.getPaginatedHistory(request);
         responseObserver.onNext(response);
         responseObserver.onCompleted();

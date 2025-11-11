@@ -4,7 +4,6 @@ import com.group9.warehouse.grpc.*;
 import io.grpc.stub.StreamObserver;
 import server.service.ProductService;
 
-// Quan trọng: extends ProductManagementServiceGrpc...
 public class ProductManagementServiceImpl extends ProductManagementServiceGrpc.ProductManagementServiceImplBase {
 
     private final ProductService productService;
@@ -12,8 +11,6 @@ public class ProductManagementServiceImpl extends ProductManagementServiceGrpc.P
     public ProductManagementServiceImpl(ProductService productService) {
         this.productService = productService;
     }
-
-    // Lưu ý: Interceptor đã check quyền Manager cho các hàm này.
 
     @Override
     public void addProduct(AddProductRequest request, StreamObserver<ServiceResponse> responseObserver) {

@@ -3,67 +3,72 @@ package server.repository;
 import server.datasource.UserDataSource;
 import server.model.User;
 
+import java.util.ArrayList; // Thêm import này
+import java.util.LinkedHashMap; // Thêm import này
 import java.util.List;
+import java.util.Map; // Thêm import này
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UserRepository {
 
-    private final List<User> users;
+    private final Map<String, User> userMap;
     private final UserDataSource dataSource;
 
     public UserRepository(UserDataSource dataSource) {
         this.dataSource = dataSource;
-        this.users = dataSource.loadUsers(); // Load 1 lần lúc khởi động
+
+        this.userMap = new LinkedHashMap<>();
+        List<User> userList = dataSource.loadUsers();
+        for (User u : userList) {
+            this.userMap.put(u.getUsername(), u);
+        }
     }
 
     public List<User> findAll() {
-        return users;
+        return new ArrayList<>(userMap.values());
     }
 
     public Optional<User> findByUsername(String username) {
         if (username == null) return Optional.empty();
-        return users.stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst();
+
+        return Optional.ofNullable(userMap.get(username));
     }
 
     public boolean existsByUsername(String username) {
-        return users.stream().anyMatch(u -> u.getUsername().equals(username));
+        return userMap.containsKey(username);
     }
 
     public boolean save(User user) {
-        // Thêm user mới vào danh sách (đã check trùng lặp ở service)
-        users.add(user);
-        return persist(); // Lưu thay đổi ra file
-    }
-
-    public boolean update(User user) {
-        // (Logic tìm và thay thế user trong list)
-        // Vì 'user' là một object đã được lấy từ list,
-        // việc thay đổi nó (ví dụ user.setActive(true))
-        // sẽ thay đổi trực tiếp. Chúng ta chỉ cần persist.
+        userMap.put(user.getUsername(), user);
         return persist();
     }
 
-    private synchronized boolean persist() {
-        // Đây là ví dụ, bạn cần hàm saveUsers trong dataSource
-        // return dataSource.saveUsers(users);
-        System.out.println("Đang lưu thay đổi vào users.json...");
-        return true; // Giả định là lưu thành công
+    public boolean update(User user) {
+        userMap.put(user.getUsername(), user);
+        return persist();
     }
 
-    // Logic Phân trang / Lọc / Tìm kiếm MỚI
-    public List<User> getPaginatedUsers(String searchTerm, Boolean isActive, int page, int pageSize) {
-        Stream<User> stream = users.stream();
+    private boolean persist() {
+        try {
+            dataSource.saveUsers(new ArrayList<>(userMap.values()));
+            System.out.println("Đang lưu thay đổi vào users.json...");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-        // 1. Filter
+
+    public List<User> getPaginatedUsers(String searchTerm, Boolean isActive, int page, int pageSize) {
+
+        Stream<User> stream = userMap.values().stream();
+
         if (isActive != null) {
             stream = stream.filter(u -> u.isActive() == isActive);
         }
 
-        // 2. Search
         if (searchTerm != null && !searchTerm.isEmpty()) {
             String lowerSearch = searchTerm.toLowerCase();
             stream = stream.filter(u ->
@@ -72,16 +77,14 @@ public class UserRepository {
             );
         }
 
-        // 3. Paginate
         return stream
                 .skip((long) (page - 1) * pageSize)
                 .limit(pageSize)
                 .collect(Collectors.toList());
     }
 
-    // Lấy tổng số lượng để phân trang
     public long countUsers(String searchTerm, Boolean isActive) {
-        Stream<User> stream = users.stream();
+        Stream<User> stream = userMap.values().stream();
 
         if (isActive != null) {
             stream = stream.filter(u -> u.isActive() == isActive);

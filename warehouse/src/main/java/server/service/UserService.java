@@ -4,6 +4,8 @@ import com.group9.warehouse.grpc.GetUsersRequest;
 import com.group9.warehouse.grpc.UserListResponse;
 import com.group9.warehouse.grpc.PaginationInfo;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.grpc.AuthServiceImpl;
 import server.model.User;
 import server.repository.UserRepository;
@@ -14,6 +16,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -39,31 +42,35 @@ public class UserService {
         UserListResponse.Builder responseBuilder = UserListResponse.newBuilder();
         responseBuilder.setPagination(pagination);
 
-        // Convert model User sang gRPC UserProfile
         for (User u : users) {
-            responseBuilder.addUsers(AuthServiceImpl.convertUserToProfile(u)); // Dùng chung hàm convert
+            responseBuilder.addUsers(AuthServiceImpl.convertUserToProfile(u));
         }
 
+        log.info("UserService/getPaginatedUsers : Return {} users", users.size());
         return responseBuilder.build();
     }
 
     public boolean addUser(String username, String password, String role, String fullName, String email) {
         if (userRepository.existsByUsername(username)) {
-            return false; // Đã tồn tại
+            log.info("UserService/addUser : Username {} was existed", username);
+            return false;
         }
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        User newUser = new User(username, hashedPassword, role, fullName, email, true); // Mặc định là active
+        User newUser = new User(username, hashedPassword, role, fullName, email, true);
 
+        log.info("UserService/addUser : Add new user with username: {}", username);
         return userRepository.save(newUser);
     }
 
     public boolean setUserActiveStatus(String username, boolean isActive) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
+            log.info("UserService/setUserActiveStatus : Username {} was existed", username);
             return false;
         }
         User user = userOptional.get();
         user.setActive(isActive);
+        log.info("UserService/setUserActiveStatus : Update user with username: {} to {}", username, isActive);
         return userRepository.update(user);
     }
 }

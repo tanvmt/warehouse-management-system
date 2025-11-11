@@ -4,6 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.group9.warehouse.grpc.UpdateProfileRequest;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import server.datasource.UserDataSource;
 import server.model.User;
 import server.repository.UserRepository;
 
@@ -12,48 +15,34 @@ import java.util.Optional;
 
 public class AuthService {
 
-    // Đây là bí mật, không được hardcode. Nên đọc từ file config.
     public static final String JWT_SECRET = "DayLaMotBiMatRatRatLao";
     public static final Algorithm JWT_ALGORITHM = Algorithm.HMAC256(JWT_SECRET);
-
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final UserRepository userRepository;
 
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    // Logic đăng nhập MỚI
     public Optional<User> validateUser(String username, String plainPassword) {
         Optional<User> userOptional = userRepository.findByUsername(username);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // 1. Kiểm tra tài khoản có bị khóa không
-            if (!user.isActive()) {
-                System.out.println("Đăng nhập thất bại: Tài khoản " + username + " đã bị khóa.");
-                return Optional.empty();
-            }
-
-            // 2. Kiểm tra mật khẩu
-            if (BCrypt.checkpw(plainPassword, user.getHashedPassword())) {
-                return userOptional; // Thành công
-            }
+        if (userOptional.isEmpty()) {
+            log.info("AuthService/Login: Username {} wasn't existed", username);
+            return Optional.empty();
         }
-        return Optional.empty(); // Sai tên hoặc sai pass
-    }
+        User user = userOptional.get();
 
-    public String generateJwtToken(User user) {
-        long EXPIRATION_TIME_MS = 86_400_000; // 1 ngày
-        return JWT.create()
-                .withSubject(user.getUsername())
-                .withClaim("role", user.getRole())
-                .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
-                .sign(JWT_ALGORITHM);
-    }
+        if (!user.isActive()) {
+            log.info("AuthService/Login:  Your account {} is banned.", username);
+            return Optional.empty();
+        }
 
-    // --- Logic Profile MỚI ---
+        if (!BCrypt.checkpw(plainPassword, user.getHashedPassword())) {
+            log.info("AuthService/Login : Password is not correct.");
+            return Optional.empty();
+        }
+        return userOptional;
+    }
 
     public Optional<User> getUserProfile(String username) {
         return userRepository.findByUsername(username);
@@ -62,35 +51,45 @@ public class AuthService {
     public boolean updateUserProfile(String username, UpdateProfileRequest request) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
+            log.info("AuthService/updateUserProfile: Username {} wasn't existed.", username);
             return false;
         }
         User user = userOptional.get();
-        // Cập nhật các trường
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setSex(request.getSex());
         user.setDateOfBirth(request.getDateOfBirth());
-
-        return userRepository.update(user); // Lưu thay đổi
+        log.info("AuthService/updateUserProfile: User profile has been updated successfully.");
+        return userRepository.update(user);
     }
 
     public boolean changePassword(String username, String oldPassword, String newPassword) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
+            log.info("AuthService/changePassword : Username {} wasn't existed.", username);
             return false;
         }
         User user = userOptional.get();
 
-        // Kiểm tra pass cũ
         if (!BCrypt.checkpw(oldPassword, user.getHashedPassword())) {
-            return false; // Mật khẩu cũ không đúng
+            log.info("AuthService/changePassword : Old password is not correct.");
+            return false;
         }
 
-        // Băm và set pass mới
         String newHashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         user.setHashedPassword(newHashedPassword);
+        log.info("AuthService/changePassword : Password has been changed successfully.");
+        return userRepository.update(user);
+    }
 
-        return userRepository.update(user); // Lưu thay đổi
+    public String generateJwtToken(User user) {
+        long EXPIRATION_TIME_MS = 86_400_000;
+        return JWT.create()
+                .withSubject(user.getUsername())
+                .withClaim("role", user.getRole())
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
+                .sign(JWT_ALGORITHM);
     }
 }

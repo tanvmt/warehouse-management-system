@@ -21,13 +21,9 @@ public class TransactionRepository {
         this.transactions = dataSource.loadTransactions();
     }
 
-    // (Giữ hàm logTransaction đã có)
-
-    // Hàm Phân trang / Lọc MỚI
     public List<Transaction> getPaginatedHistory(String startDateStr, String endDateStr, int page, int pageSize) {
         Stream<Transaction> stream = transactions.stream();
 
-        // 1. Filter theo ngày
         try {
             if (startDateStr != null && !startDateStr.isEmpty()) {
                 LocalDate startDate = LocalDate.parse(startDateStr, DATE_FORMATTER);
@@ -39,10 +35,8 @@ public class TransactionRepository {
             }
         } catch (Exception e) {
             System.err.println("Lỗi parse ngày: " + e.getMessage());
-            // Có thể bỏ qua lọc nếu ngày sai
         }
 
-        // 2. Paginate (Sắp xếp mới nhất lên trước)
         return stream
                 .sorted((t1, t2) -> t2.getTimestamp().compareTo(t1.getTimestamp()))
                 .skip((long) (page - 1) * pageSize)
@@ -53,7 +47,6 @@ public class TransactionRepository {
     public long countHistory(String startDateStr, String endDateStr) {
         Stream<Transaction> stream = transactions.stream();
 
-        // (Copy logic lọc ở trên)
         try {
             if (startDateStr != null && !startDateStr.isEmpty()) {
                 LocalDate startDate = LocalDate.parse(startDateStr, DATE_FORMATTER);
@@ -66,5 +59,10 @@ public class TransactionRepository {
         } catch (Exception e) { /* Bỏ qua */ }
 
         return stream.count();
+    }
+
+    public void save(Transaction transaction) {
+        transactions.add(transaction);
+        dataSource.saveTransactions(transactions);
     }
 }

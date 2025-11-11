@@ -2,27 +2,13 @@ package server;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import server.datasource.ProductDataSource;
-import server.datasource.TransactionDataSource;
-import server.datasource.UserDataSource;
-import server.grpc.AuthServiceImpl;
-import server.grpc.ProductManagementServiceImpl;
-import server.grpc.UserManagementServiceImpl;
-import server.grpc.WarehouseServiceImpl;
-import server.interceptor.AuthInterceptor;
-import server.repository.ProductRepository;
-import server.repository.TransactionRepository;
-import server.repository.UserRepository;
-import server.service.AuthService;
-import server.service.ProductService;
-import server.service.TransactionService;
-import server.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import server.container.ApplicationContainer;
 
 import java.io.IOException;
 import java.net.BindException;
 import java.util.concurrent.Executors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServerApp {
 
@@ -32,73 +18,49 @@ public class ServerApp {
     public static void main(String[] args) {
 
         try {
-            // --- 1. Khởi tạo DataSources (Đọc file JSON) ---
-            logger.info("Đang tải dữ liệu từ DataSources...");
-            UserDataSource userDataSource = new UserDataSource();
-            ProductDataSource productDataSource = new ProductDataSource();
-            TransactionDataSource transactionDataSource = new TransactionDataSource();
+            logger.info("Initializing Application Container...");
 
-            logger.info("Tải dữ liệu thành công.");
+            ApplicationContainer container = new ApplicationContainer();
 
-            // --- 2. Khởi tạo Repositories ---
-            UserRepository userRepository = new UserRepository(userDataSource);
-            ProductRepository productRepository = new ProductRepository(productDataSource);
-            TransactionRepository transactionRepository = new TransactionRepository(transactionDataSource);
+            logger.info("Application Container is ready.");
+            logger.info("Preparing to start server on port " + PORT);
 
-            // --- 3. Khởi tạo Services (Tầng Logic) ---
-            AuthService authService = new AuthService(userRepository);
-            UserService userService = new UserService(userRepository);
-            ProductService productService = new ProductService(productRepository);
-            TransactionService transactionService = new TransactionService(transactionRepository);
 
-            // --- 4. Khởi tạo gRPC Implementations ---
-            AuthServiceImpl authServiceImpl = new AuthServiceImpl(authService);
-            UserManagementServiceImpl userManagementServiceImpl = new UserManagementServiceImpl(userService);
-            ProductManagementServiceImpl productManagementServiceImpl = new ProductManagementServiceImpl(productService);
-            WarehouseServiceImpl warehouseServiceImpl = new WarehouseServiceImpl(productService, transactionService);
-
-            // --- 5. Khởi tạo Interceptor (Bảo mật) ---
-            AuthInterceptor authInterceptor = new AuthInterceptor();
-
-            logger.info("Chuẩn bị khởi động server tại cổng " + PORT);
-
-            // --- 6. Khởi động Server ---
             Server server = ServerBuilder.forPort(PORT)
-                    .addService(authServiceImpl)
-                    .addService(userManagementServiceImpl)
-                    .addService(productManagementServiceImpl)
-                    .addService(warehouseServiceImpl)
-                    .intercept(authInterceptor)
+                    .addService(container.getAuthServiceImpl())
+                    .addService(container.getUserManagementServiceImpl())
+                    .addService(container.getProductManagementServiceImpl())
+                    .addService(container.getWarehouseServiceImpl())
+                    .intercept(container.getAuthInterceptor())
                     .executor(Executors.newFixedThreadPool(16))
                     .build();
 
             server.start();
 
             logger.info("***********************************************");
-            logger.info("*** Server đã khởi động thành công trên cổng {} ***", PORT);
+            logger.info("*** Server is started successfully from port {} ***", PORT);
             logger.info("***********************************************");
-
 
             server.awaitTermination();
 
         } catch (BindException e) {
-            logger.error("!!! LỖI KHỞI ĐỘNG NGHIÊM TRỌNG !!!", e);
-            logger.error("Không thể khởi động server. Cổng {} đã có ứng dụng khác sử dụng.", PORT);
-            logger.error("Hãy kiểm tra và tắt ứng dụng đó trước khi chạy lại.");
+            logger.error("!!! FATAL STARTUP ERROR !!!", e);
+            logger.error("Could not start server. Port {} is already in use by another application.", PORT);
+            logger.error("Please check and stop that application before running again.");
 
         } catch (IOException e) {
-            logger.error("!!! LỖI KHỞI ĐỘNG NGHIÊM TRỌNG (IOException) !!!", e);
-            logger.error("Lỗi: {}. Có thể do không tìm thấy file JSON (users.json, products.json) hoặc lỗi khi start server.", e.getMessage());
+            logger.error("!!! FATAL STARTUP ERROR (IOException) !!!", e);
+            logger.error("Error: {}. This might be due to missing JSON files (users.json, products.json) or a server start error.", e.getMessage());
 
         } catch (InterruptedException e) {
-            logger.warn("Server bị ngắt (InterruptedException). Đang tắt...", e);
+            logger.warn("Server was interrupted (InterruptedException). Shutting down...", e);
             Thread.currentThread().interrupt();
 
         } catch (Exception e) {
-            logger.error("!!! LỖI KHÔNG XÁC ĐỊNH KHI KHỞI ĐỘNG !!!", e);
-            logger.error("Server đã gặp lỗi không lường trước: {}", e.getMessage());
+            logger.error("!!! UNKNOWN STARTUP ERROR !!!", e);
+            logger.error("Server encountered an unexpected error: {}", e.getMessage());
         }
 
-        logger.info("Server đã tắt.");
+        logger.info("Server has been shut down.");
     }
 }
