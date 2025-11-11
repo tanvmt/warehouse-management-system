@@ -4,8 +4,10 @@ public class SessionManager {
     private static String username;
     private static String role;
     private static String authToken;
+    private static String fullName;
 
-    public static void createSession(String user, String userRole, String token) {
+    public static void createSession(String user, String userRole, String token, String name) {
+        fullName = name;
         username = user;
         role = userRole;
         authToken = token;
@@ -23,6 +25,10 @@ public class SessionManager {
         return authToken;
     }
 
+    public static String getFullName() {
+        return fullName;
+    }
+
     public static boolean isManager() {
         return "Manager".equals(role);
     }
@@ -31,5 +37,6 @@ public class SessionManager {
         username = null;
         role = null;
         authToken = null;
+        fullName = null;
     }
 }

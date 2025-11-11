@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
 
 
 public class UserDataSource {
@@ -22,18 +21,14 @@ public class UserDataSource {
 
     public List<User> loadUsers() {
         try {
-            Gson gson = new Gson();
             Reader reader = new FileReader(USERS_FILE);
-
-            Type userListType = new TypeToken<Map<String, List<User>>>() {}.getType();
-            Map<String, List<User>> userMap = gson.fromJson(reader, userListType);
-
-            List<User> users = userMap.get("users");
-            log.info("UserDataSource: Đã tải {} người dùng.", users.size());
-            return users;
+            Type userListType = new TypeToken<List<User>>() {}.getType();
+            List<User> userList = gson.fromJson(reader, userListType);
+            log.info("UserDataSource: Đã tải {} người dùng.", userList.size());
+            return userList;
         } catch (FileNotFoundException e) {
             log.error("Không tìm thấy file {}. Trả về danh sách rỗng.", USERS_FILE, e);
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
     }
 

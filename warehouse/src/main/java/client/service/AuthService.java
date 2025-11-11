@@ -3,6 +3,8 @@ package client.service;
 import com.group9.warehouse.grpc.LoginRequest;
 import com.group9.warehouse.grpc.LoginResponse;
 import com.group9.warehouse.grpc.AuthServiceGrpc;
+import com.group9.warehouse.grpc.EmptyRequest;
+import com.group9.warehouse.grpc.ProfileResponse;
 
 public class AuthService {
     private String errorMessage;
@@ -32,7 +34,12 @@ public class AuthService {
 
             if (response.getSuccess()) {
                 String token = response.getToken();
-                SessionManager.createSession(username, response.getRole(), token);
+                SessionManager.createSession(null, null, token, null);
+                
+                ProfileResponse profileResponse = authStub.getUserProfile(EmptyRequest.newBuilder().build());
+                String fullName = profileResponse.getProfile().getFullName();
+                
+                SessionManager.createSession(username, response.getRole(), token, fullName);
                 return true;
             } else {
                 this.errorMessage = "Đăng nhập thất bại: " + response.getMessage();

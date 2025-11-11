@@ -16,7 +16,7 @@ public class MainAppWindowController {
     
     @FXML
     public void initialize() {
-        usernameLabel.setText(SessionManager.getUsername());
+        usernameLabel.setText(SessionManager.getFullName());
         roleLabel.setText(SessionManager.getRole());
 
         NavigationController.setMainController(this);
