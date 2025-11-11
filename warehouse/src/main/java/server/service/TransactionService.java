@@ -3,6 +3,8 @@ package server.service;
 import com.group9.warehouse.grpc.GetHistoryRequest;
 import com.group9.warehouse.grpc.HistoryResponse;
 import com.group9.warehouse.grpc.PaginationInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.model.Transaction;
 import server.repository.TransactionRepository;
 
@@ -13,16 +15,17 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
 
     public void logTransaction(String clientName, String action, String product, int quantity, String result) {
+        log.info("TransactionService/logTransaction : Save log ");
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         Transaction transaction = new Transaction(timestamp, clientName, action, product, quantity, result);
         transactionRepository.save(transaction);
-
     }
 
     public HistoryResponse getPaginatedHistory(GetHistoryRequest request) {
@@ -59,6 +62,7 @@ public class TransactionService {
             );
         }
 
+        log.info("TransactionService/getPaginatedHistory : Return {} transactions", transactions.size());
         return responseBuilder.build();
     }
 }

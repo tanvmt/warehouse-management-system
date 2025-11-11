@@ -27,18 +27,18 @@ public class AuthService {
     public Optional<User> validateUser(String username, String plainPassword) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
-            log.info("Username {} khong ton tai", username);
+            log.info("AuthService/Login: Username {} wasn't existed", username);
             return Optional.empty();
         }
         User user = userOptional.get();
 
         if (!user.isActive()) {
-            log.info("Đăng nhập thất bại: Tài khoản {} đã bị khóa.", username);
+            log.info("AuthService/Login:  Your account {} is banned.", username);
             return Optional.empty();
         }
 
         if (!BCrypt.checkpw(plainPassword, user.getHashedPassword())) {
-            log.info("Password khong dung");
+            log.info("AuthService/Login : Password is not correct.");
             return Optional.empty();
         }
         return userOptional;
@@ -51,7 +51,7 @@ public class AuthService {
     public boolean updateUserProfile(String username, UpdateProfileRequest request) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
-            log.info("Username {} khong ton tai", username);
+            log.info("AuthService/updateUserProfile: Username {} wasn't existed.", username);
             return false;
         }
         User user = userOptional.get();
@@ -60,26 +60,26 @@ public class AuthService {
         user.setPhone(request.getPhone());
         user.setSex(request.getSex());
         user.setDateOfBirth(request.getDateOfBirth());
-
+        log.info("AuthService/updateUserProfile: User profile has been updated successfully.");
         return userRepository.update(user);
     }
 
     public boolean changePassword(String username, String oldPassword, String newPassword) {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
-            log.info("Username {} khong ton tai", username);
+            log.info("AuthService/changePassword : Username {} wasn't existed.", username);
             return false;
         }
         User user = userOptional.get();
 
         if (!BCrypt.checkpw(oldPassword, user.getHashedPassword())) {
-            log.info("password cu khong dung");
+            log.info("AuthService/changePassword : Old password is not correct.");
             return false;
         }
 
         String newHashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         user.setHashedPassword(newHashedPassword);
-
+        log.info("AuthService/changePassword : Password has been changed successfully.");
         return userRepository.update(user);
     }
 

@@ -8,7 +8,6 @@ import server.service.AuthService;
 
 import java.util.Optional;
 
-// Quan trọng: extends AuthServiceGrpc...
 public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
 
     private final AuthService authService;
@@ -25,7 +24,7 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            String token = authService.generateJwtToken(user); // Tạo token
+            String token = authService.generateJwtToken(user);
 
             responseBuilder
                     .setSuccess(true)
@@ -87,14 +86,13 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
         responseObserver.onCompleted();
     }
 
-    // Hàm helper để convert
+
     public static UserProfile convertUserToProfile(User user) {
         UserProfile.Builder builder = UserProfile.newBuilder();
         builder.setUsername(user.getUsername())
                 .setRole(user.getRole())
                 .setIsActive(user.isActive());
 
-        // Các trường có thể null
         if (user.getFullName() != null) builder.setFullName(user.getFullName());
         if (user.getEmail() != null) builder.setEmail(user.getEmail());
         if (user.getPhone() != null) builder.setPhone(user.getPhone());

@@ -2,26 +2,37 @@
   {
     "productId": "MS-LOGI",
     "productName": "Chuột Logitech",
-    "quantity": 20
+    "quantity": 20,
+    "isActive": true
   },
   {
     "productId": "TN-04",
     "productName": "Tai nghe không dây",
-    "quantity": 0
+    "quantity": 0,
+    "isActive": true
   },
   {
     "productId": "MN-32",
     "productName": "Màn hình 32in",
-    "quantity": 30
+    "quantity": 30,
+    "isActive": true
   },
   {
     "productId": "LP-DELL",
     "productName": "Laptop Dell",
-    "quantity": 15
+    "quantity": 15,
+    "isActive": true
   },
   {
     "productId": "KB-CO",
     "productName": "Bàn phím cơ",
-    "quantity": 20
+    "quantity": 30,
+    "isActive": true
+  },
+  {
+    "productId": "TN-05",
+    "productName": "Tai nghe có dây",
+    "quantity": 0,
+    "isActive": true
   }
 ]

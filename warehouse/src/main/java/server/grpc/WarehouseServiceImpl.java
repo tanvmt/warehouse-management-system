@@ -5,7 +5,6 @@ import server.interceptor.AuthInterceptor;
 import server.model.Product;
 import io.grpc.stub.StreamObserver;
 import server.service.ProductService;
-import server.model.Transaction;
 import server.service.TransactionService;
 
 import java.util.List;

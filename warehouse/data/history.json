@@ -94,5 +94,45 @@
     "product": "Laptop Dell",
     "quantity": 15,
     "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:34.0303272",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:43.6010018",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:47.5051223",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 20,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:55.9343717",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Tai nghe không dây",
+    "quantity": 10,
+    "result": "Failed (Không đủ hàng tồn kho)"
+  },
+  {
+    "timestamp": "2025-11-11T15:15:27.9220057",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
   }
 ]

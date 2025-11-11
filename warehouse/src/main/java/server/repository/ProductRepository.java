@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 public class ProductRepository {
 
-    // Thay đổi: Dùng Map để truy cập O(1)
     private final Map<String, Product> productMap;
     private final ProductDataSource dataSource;
 
@@ -51,7 +50,7 @@ public class ProductRepository {
     }
 
     public long countProducts(String searchTerm, Boolean isActive) {
-        // Thay đổi: Lấy stream từ .values() của Map
+
         Stream<Product> stream = productMap.values().stream();
 
         if (isActive != null) {
@@ -69,6 +68,10 @@ public class ProductRepository {
     }
 
     public Optional<Product> findById(String productId) {
+        return Optional.ofNullable(productMap.get(productId));
+    }
+
+    public Optional<Product> findById_NoLock(String productId) {
         return Optional.ofNullable(productMap.get(productId));
     }
 
