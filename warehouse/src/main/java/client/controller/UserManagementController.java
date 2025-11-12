@@ -20,13 +20,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
-import com.group9.warehouse.grpc.BoolValue;
 
 import java.io.IOException;
 
 import client.model.UserProfile; 
 import com.group9.warehouse.grpc.*; 
 import client.service.GrpcClientService;
+import client.service.SessionManager;
 
 public class UserManagementController {
 
@@ -95,10 +95,35 @@ public class UserManagementController {
             };
         });
         
-        statusFilterComboBox.setItems(FXCollections.observableArrayList("Tất cả", "Hoạt động", "Không hoạt động"));
+        statusFilterComboBox.setItems(FXCollections.observableArrayList("Tất cả", "Kích hoạt", "Vô hiệu hóa"));
         statusFilterComboBox.setValue("Tất cả");
 
+        usersTable.getSelectionModel().selectedItemProperty().addListener(
+            (obs, oldSelection, newSelection) -> {
+                updateActionButtons(newSelection);
+            }
+        );
+
+        updateActionButtons(null);
+
         loadUserList();
+    }
+
+    private void updateActionButtons(UserProfile selectedUser) {
+        String currentUsername = SessionManager.getUsername();
+
+        if (selectedUser == null || selectedUser.getUsername().equals(currentUsername)) {
+            setActiveButton.setDisable(true);
+            setInactiveButton.setDisable(true);
+        } else {
+            if (selectedUser.isActive()) {
+                setActiveButton.setDisable(true);
+                setInactiveButton.setDisable(false); 
+            } else {
+                setActiveButton.setDisable(false);
+                setInactiveButton.setDisable(true);  
+            }
+        }
     }
 
     @FXML
@@ -224,7 +249,7 @@ public class UserManagementController {
             return;
         }
 
-        if (selectedUser.getUsername().equals(client.service.SessionManager.getUsername())) {
+        if (selectedUser.getUsername().equals(SessionManager.getUsername())) {
              showAlert("Lỗi", "Bạn không thể tự thay đổi trạng thái của chính mình.", AlertType.ERROR);
              return;
         }

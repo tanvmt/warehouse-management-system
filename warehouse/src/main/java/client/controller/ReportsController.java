@@ -11,11 +11,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import client.service.GrpcClientService;
 import com.group9.warehouse.grpc.*;
+
+import client.model.ProductSummary;
 import client.model.Transaction;
 import client.util.PdfGenerator;
 
@@ -30,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javafx.scene.CacheHint;
 
 public class ReportsController {
 
@@ -44,28 +49,40 @@ public class ReportsController {
     @FXML private Button exportPdfButton;
 
     // Bảng dữ liệu
-    @FXML private TableView<Transaction> filteredHistoryTable;
-    @FXML private TableColumn<Transaction, String> timestampCol;
-    @FXML private TableColumn<Transaction, String> clientNameCol;
-    @FXML private TableColumn<Transaction, String> actionCol;
-    @FXML private TableColumn<Transaction, String> productCol;
-    @FXML private TableColumn<Transaction, Integer> quantityCol;
-    @FXML private TableColumn<Transaction, String> resultCol;
+    @FXML private TableView<ProductSummary> summaryTable;
+    @FXML private TableColumn<ProductSummary, String> sumProductCol;
+    @FXML private TableColumn<ProductSummary, Integer> sumImportCol;
+    @FXML private TableColumn<ProductSummary, Integer> sumExportCol;
+    @FXML private TableColumn<ProductSummary, Integer> sumInventoryCol;
+
+    @FXML
+    private VBox mainVBox;
+    @FXML
+    private ScrollPane mainScrollPane;
+
+
 
     private GrpcClientService grpcClientService;
     private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
 
-    // Dùng để parse ngày tháng từ server
-    private final DateTimeFormatter isoFormatter = DateTimeFormatter.ISO_DATE_TIME;
-    private final DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
-    private final ZoneId localZoneId = ZoneId.systemDefault();
+    private final DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE; 
 
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
         warehouseStub = grpcClientService.getWarehouseStub();
-        
-        setupHistoryTable();
+
+        setupSummaryTable();
+
+        mainVBox.setCache(true);
+        mainVBox.setCacheHint(CacheHint.SPEED);
+
+        mainScrollPane.setOnScroll(e -> {
+            double deltaY = e.getDeltaY() * 10.0; 
+            double height = mainScrollPane.getContent().getBoundsInLocal().getHeight();
+            double vValue = mainScrollPane.getVvalue();
+            mainScrollPane.setVvalue(vValue - deltaY / height);
+        });
 
         startDatePicker.setValue(LocalDate.now().withDayOfMonth(1));
         endDatePicker.setValue(LocalDate.now());
@@ -75,25 +92,26 @@ public class ReportsController {
         handleFilterButton();
     }
 
-    private void setupHistoryTable() {
-        timestampCol.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
-        clientNameCol.setCellValueFactory(new PropertyValueFactory<>("clientName"));
-        actionCol.setCellValueFactory(new PropertyValueFactory<>("action"));
-        productCol.setCellValueFactory(new PropertyValueFactory<>("product"));
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        resultCol.setCellValueFactory(new PropertyValueFactory<>("result"));
+    private void setupSummaryTable() {
+        sumProductCol.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        sumImportCol.setCellValueFactory(new PropertyValueFactory<>("totalImport"));
+        sumExportCol.setCellValueFactory(new PropertyValueFactory<>("totalExport"));
+        sumInventoryCol.setCellValueFactory(new PropertyValueFactory<>("totalInventory")); 
     }
 
     @FXML
     private void handleFilterButton() {
         loadPieChartData();
-        loadFilteredHistoryData();
+        loadSummaryReportData();
+        mainVBox.setCache(false);
+        mainVBox.setCache(true);
         // exportPdfButton.setDisable(false);
     }
 
-   @FXML
+    @FXML
     private void handleExportPdf() {
-        List<Transaction> dataToExport = filteredHistoryTable.getItems();
+        List<ProductSummary> dataToExport = summaryTable.getItems();
+        
         if (dataToExport == null || dataToExport.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Không có dữ liệu", "Không có dữ liệu để xuất.");
             return;
@@ -115,9 +133,12 @@ public class ReportsController {
 
         if (file != null) {
             try {
-                PdfGenerator.createReport(file, dataToExport, 
+                PdfGenerator.createReport(file, 
                                           startDatePicker.getValue(), 
-                                          endDatePicker.getValue());
+                                          endDatePicker.getValue(),
+                                          dataToExport,
+                                          inventoryPieChart,
+                                          activityBarChart);
                 
                 showAlert(Alert.AlertType.INFORMATION, "Thành công", 
                           "Đã xuất báo cáo PDF thành công:\n" + file.getAbsolutePath());
@@ -144,103 +165,47 @@ public class ReportsController {
         }
     }
 
-    private void loadFilteredHistoryData() {
+    private void loadSummaryReportData() {
         try {
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
 
-            ZonedDateTime startDateTime = startDate.atStartOfDay(localZoneId);
-            ZonedDateTime endDateTime = endDate.atTime(LocalTime.MAX).atZone(localZoneId);
-
             GetHistoryRequest request = GetHistoryRequest.newBuilder()
-                .setPage(1)
-                .setPageSize(1000) 
+                .setStartDate(startDate.format(isoDateFormatter))
+                .setEndDate(endDate.format(isoDateFormatter))
                 .build();
-            HistoryResponse response = warehouseStub.getHistory(request);
 
-            List<Transaction> filteredList = response.getTransactionsList().stream()
-                .map(tx -> {
-                    ZonedDateTime txDateTime = parseTimestamp(tx.getTimestamp());
-                    
-                    return new Transaction(
-                        formatTimestamp(txDateTime),
-                        tx.getClientName(),
-                        tx.getAction(),
-                        tx.getProduct(),
-                        tx.getQuantity(),
-                        tx.getResult(),
-                        txDateTime 
-                    );
-                })
-                .filter(tx -> tx.getZonedDateTime() != null && 
-                               !tx.getZonedDateTime().isBefore(startDateTime) && 
-                               !tx.getZonedDateTime().isAfter(endDateTime))
-                .collect(Collectors.toList());
+            SummaryReportResponse response = warehouseStub.getSummaryReport(request);
 
-            updateBarChart(filteredList);
-            updateHistoryTable(filteredList);
-
-            exportPdfButton.setDisable(filteredList.isEmpty());
-        } catch (Exception e) {
-            System.out.println("Error loading filtered history data: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void updateBarChart(List<Transaction> transactions) {
-        Map<String, Double> importMap = new HashMap<>();
-        Map<String, Double> exportMap = new HashMap<>();
-
-        for (Transaction tx : transactions) {
-            if (tx.getResult().startsWith("Success")) {
-                if (tx.getAction().equals("NHAP") || tx.getAction().equals("IMPORT")) {
-                    importMap.put(tx.getProduct(),
-                            importMap.getOrDefault(tx.getProduct(), 0.0) + tx.getQuantity());
-                } else if (tx.getAction().equals("XUAT") || tx.getAction().equals("EXPORT")) {
-                    exportMap.put(tx.getProduct(),
-                            exportMap.getOrDefault(tx.getProduct(), 0.0) + tx.getQuantity());
-                }
+            ObservableList<ProductSummary> summaryData = FXCollections.observableArrayList();
+            XYChart.Series<String, Number> importSeries = new XYChart.Series<>();
+            importSeries.setName("Nhập");
+            XYChart.Series<String, Number> exportSeries = new XYChart.Series<>();
+            exportSeries.setName("Xuất");
+            
+            for (SummaryItem item : response.getItemsList()) {
+                
+                summaryData.add(new ProductSummary(
+                    item.getProductName(), 
+                    item.getTotalImport(), 
+                    item.getTotalExport(),
+                    item.getInventoryQuantity() 
+                ));
+                
+                importSeries.getData().add(new XYChart.Data<>(item.getProductName(), item.getTotalImport()));
+                exportSeries.getData().add(new XYChart.Data<>(item.getProductName(), item.getTotalExport()));
             }
+
+            activityBarChart.getData().clear();
+            activityBarChart.getData().addAll(importSeries, exportSeries);
+            summaryTable.setItems(summaryData);
+
+            exportPdfButton.setDisable(summaryData.isEmpty());
+        } catch (Exception e) {
+            System.out.println("Error loading summary report data: " + e.getMessage());
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Lỗi Tải Báo Cáo", "Không thể tải dữ liệu báo cáo từ server: " + e.getMessage());
         }
-
-        XYChart.Series<String, Number> importSeries = new XYChart.Series<>();
-        importSeries.setName("Nhập");
-        XYChart.Series<String, Number> exportSeries = new XYChart.Series<>();
-        exportSeries.setName("Xuất");
-
-        java.util.Set<String> allProductNames = new java.util.HashSet<>(importMap.keySet());
-        allProductNames.addAll(exportMap.keySet());
-        java.util.List<String> sortedProducts = new java.util.ArrayList<>(allProductNames);
-        java.util.Collections.sort(sortedProducts);
-        
-        for (String productName : sortedProducts) {
-            double importQty = importMap.getOrDefault(productName, 0.0);
-            importSeries.getData().add(new XYChart.Data<>(productName, importQty));
-            double exportQty = exportMap.getOrDefault(productName, 0.0);
-            exportSeries.getData().add(new XYChart.Data<>(productName, exportQty));
-        }
-
-        activityBarChart.getData().clear();
-        activityBarChart.getData().addAll(importSeries, exportSeries);
-    }
-
-    private void updateHistoryTable(List<Transaction> transactions) {
-        filteredHistoryTable.setItems(FXCollections.observableArrayList(transactions));
-    }
-
-    private ZonedDateTime parseTimestamp(String isoTimestamp) {
-        try {
-            return ZonedDateTime.parse(isoTimestamp, isoFormatter).withZoneSameInstant(localZoneId);
-        } catch (DateTimeParseException e) {
-            System.err.println("Lỗi parse ngày tháng: " + isoTimestamp);
-            return null;
-        }
-    }
-    
-    private String formatTimestamp(ZonedDateTime localDateTime) {
-        if (localDateTime == null)
-            return "N/A";
-        return localDateTime.format(outputFormatter);
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String content) {

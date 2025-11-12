@@ -26,17 +26,12 @@
              </Button>
         </HBox>
       
-        <GridPane hgap="20" vgap="20" styleClass="kpi-grid-pane">
+        <HBox spacing="20" styleClass="kpi-grid-pane">
             <padding>
                 <Insets top="10.0" />
             </padding>
-            <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" />
-                <ColumnConstraints hgrow="ALWAYS" />
-                <ColumnConstraints hgrow="ALWAYS" />
-            </columnConstraints>
             
-            <HBox styleClass="kpi-card" GridPane.columnIndex="0">
+            <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
                 <children>
                     <FontIcon iconLiteral="fas-boxes" styleClass="kpi-icon" />
                     <VBox HBox.hgrow="ALWAYS">
@@ -46,17 +41,17 @@
                 </children>
             </HBox>
             
-            <HBox styleClass="kpi-card" GridPane.columnIndex="1">
+            <HBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
                 <children>
                     <FontIcon iconLiteral="fas-warehouse" styleClass="kpi-icon" />
                     <VBox HBox.hgrow="ALWAYS">
-                        <Label fx:id="totalStockLabel" text="0" styleClass="kpi-number-label" />
+                         <Label fx:id="totalStockLabel" text="0" styleClass="kpi-number-label" />
                         <Label text="Tổng số lượng tồn kho" styleClass="kpi-title-label" />
                     </VBox>
                 </children>
             </HBox>
             
-            <HBox styleClass="kpi-card" GridPane.columnIndex="2">
+            <HBox fx:id="kpiTotalUsers" styleClass="kpi-card" HBox.hgrow="ALWAYS">
                 <children>
                     <FontIcon iconLiteral="fas-users" styleClass="kpi-icon" />
                     <VBox HBox.hgrow="ALWAYS">
@@ -65,7 +60,7 @@
                     </VBox>
                 </children>
             </HBox>
-        </GridPane>
+        </HBox>
 
         <SplitPane dividerPositions="0.4" VBox.vgrow="ALWAYS">
             <items>

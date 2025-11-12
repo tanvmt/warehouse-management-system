@@ -6,9 +6,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.DatePicker;
 import javafx.collections.FXCollections;
 import javafx.stage.Stage;
 import javafx.application.Platform;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 
 import com.group9.warehouse.grpc.AddUserRequest;
 import com.group9.warehouse.grpc.ServiceResponse;
@@ -22,6 +25,10 @@ public class AddUserDialogController {
     @FXML private TextField fullNameField;
     @FXML private TextField emailField;
     
+    @FXML private TextField phoneField;
+    @FXML private ComboBox<String> sexComboBox;
+    @FXML private DatePicker dobPicker;
+    
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
     @FXML private Label statusLabel;
@@ -30,9 +37,12 @@ public class AddUserDialogController {
     private UserManagementServiceGrpc.UserManagementServiceBlockingStub userManagementStub;
     private boolean saved = false;
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @FXML
     public void initialize() {
         roleComboBox.setItems(FXCollections.observableArrayList("Manager", "Staff"));
+        sexComboBox.setItems(FXCollections.observableArrayList("Nam", "Nữ", "Khác"));
     }
 
     public void setDialogStage(Stage dialogStage) {
@@ -54,11 +64,17 @@ public class AddUserDialogController {
         String role = roleComboBox.getValue();
         String fullName = fullNameField.getText().trim();
         String email = emailField.getText().trim();
+        String phone = phoneField.getText().trim();
+        String sex = sexComboBox.getValue();
+        LocalDate dob = dobPicker.getValue();
 
-        if (username.isEmpty() || password.isEmpty() || role == null || fullName.isEmpty() || email.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || role == null || fullName.isEmpty() || email.isEmpty() || 
+                phone.isEmpty() || sex == null || dob == null) {
             showStatus("Lỗi: Vui lòng nhập đầy đủ tất cả thông tin.", false);
             return;
         }
+
+        String dobString = dob.format(DATE_FORMATTER);
 
         try {
             AddUserRequest request = AddUserRequest.newBuilder()
@@ -66,7 +82,10 @@ public class AddUserDialogController {
                     .setPassword(password)
                     .setRole(role)
                     .setFullName(fullName) 
-                    .setEmail(email)       
+                    .setEmail(email)
+                    .setPhone(phone)
+                    .setSex(sex)
+                    .setDateOfBirth(dobString)      
                     .build();
 
             ServiceResponse response = userManagementStub.addUser(request);

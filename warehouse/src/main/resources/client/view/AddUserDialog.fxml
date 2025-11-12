@@ -35,6 +35,15 @@
             
             <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
             <TextField fx:id="emailField" promptText="ví dụ: e@company.com" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+            <Label text="Số điện thoại:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+            <TextField fx:id="phoneField" promptText="ví dụ: 0901234567" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            
+            <Label text="Giới tính:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+            <ComboBox fx:id="sexComboBox" promptText="Chọn giới tính" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            
+            <Label text="Ngày sinh:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+            <DatePicker fx:id="dobPicker" promptText="Chọn ngày sinh" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7" />
             <columnConstraints>
                 <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
                 <ColumnConstraints hgrow="ALWAYS" />

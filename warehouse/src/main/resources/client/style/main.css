@@ -35,7 +35,7 @@
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-text-fill: #003049;
-    -fx-padding: 10 0 20 5;
+    -fx-padding: 10 0 10 5;
 }
 
 .card-title {
@@ -145,9 +145,10 @@
 }
 
 .navigation-button:focused {
-    -fx-background-color: #0a9396;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
+    -fx-background-color: transparent;
+    /* -fx-border-color: #0a9396; Chỉ hiển thị viền khi focus (tùy chọn) */
+    /* -fx-border-width: 2px; */
+    -fx-border-radius: 8;
 }
 
 /* === THÊM MỚI: Hiệu ứng khi nhấn chuột === */
@@ -466,3 +467,22 @@
     -fx-text-fill: #003049;       
     -fx-font-weight: bold;
 }
+
+.navigation-button.nav-selected {
+    -fx-background-color: #0a9396;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;   /* Bo tròn */
+    -fx-background-insets: 0;   /* Ép nền vẽ sát mép ngoài */
+    -fx-border-radius: 8;       /* Bo luôn viền (phòng trường hợp có border) */
+}
+
+
+
+.navigation-button.nav-selected:hover {
+    -fx-background-color: #0077b6;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+    -fx-border-radius: 8;
+}
+

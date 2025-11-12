@@ -13,12 +13,12 @@
                   <FontIcon iconLiteral="fas-tachometer-alt" styleClass="nav-icon" />
                </graphic>
             </Button>
-            <Button onAction="#loadWarehouseView" styleClass="navigation-button" text="Kho hàng">
+            <Button fx:id="warehouseButton" onAction="#loadWarehouseView" styleClass="navigation-button" text="Kho hàng">
                <graphic>
                   <FontIcon iconLiteral="fas-warehouse" styleClass="nav-icon" />
                </graphic>
             </Button>
-            <Button onAction="#loadHistoryView" styleClass="navigation-button" text="Lịch sử Giao dịch">
+            <Button fx:id="historyButton" onAction="#loadHistoryView" styleClass="navigation-button" text="Lịch sử Giao dịch">
                <graphic>
                   <FontIcon iconLiteral="fas-history" styleClass="nav-icon" />
                </graphic>

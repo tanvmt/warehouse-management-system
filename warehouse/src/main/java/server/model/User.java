@@ -13,12 +13,15 @@ public class User {
 
     public User() {}
 
-    public User(String username, String hashedPassword, String role, String fullName, String email, boolean isActive) {
+    public User(String username, String hashedPassword, String role, String fullName, String email, String phone, String sex, String dateOfBirth, boolean isActive) {
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.role = role;
         this.fullName = fullName;
         this.email = email;
+        this.phone = phone;
+        this.sex = sex;
+        this.dateOfBirth = dateOfBirth;
         this.isActive = isActive;
     }
 

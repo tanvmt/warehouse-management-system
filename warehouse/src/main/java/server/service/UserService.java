@@ -50,13 +50,13 @@ public class UserService {
         return responseBuilder.build();
     }
 
-    public boolean addUser(String username, String password, String role, String fullName, String email) {
+    public boolean addUser(String username, String password, String role, String fullName, String email, String phone, String sex, String dateOfBirth) {
         if (userRepository.existsByUsername(username)) {
             log.info("UserService/addUser : Username {} was existed", username);
             return false;
         }
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        User newUser = new User(username, hashedPassword, role, fullName, email, true);
+        User newUser = new User(username, hashedPassword, role, fullName, email, phone, sex, dateOfBirth, true);
 
         log.info("UserService/addUser : Add new user with username: {}", username);
         return userRepository.save(newUser);

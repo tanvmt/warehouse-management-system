@@ -87,7 +87,30 @@ public class ProductManagerController {
         statusFilterComboBox.setItems(FXCollections.observableArrayList("Tất cả", "Hoạt động", "Không hoạt động"));
         statusFilterComboBox.setValue("Tất cả");
 
+        productsTable.getSelectionModel().selectedItemProperty().addListener(
+            (obs, oldSelection, newSelection) -> {
+                updateActionButtons(newSelection);
+            }
+        );
+
+        updateActionButtons(null);
+
         loadProductList();
+    }
+
+    private void updateActionButtons(Product selectedProduct) {
+        if (selectedProduct == null) {
+            setActiveButton.setDisable(true);
+            setInactiveButton.setDisable(true);
+        } else {
+            if (selectedProduct.isActive()) {
+                setActiveButton.setDisable(true);
+                setInactiveButton.setDisable(false);
+            } else {
+                setActiveButton.setDisable(false);
+                setInactiveButton.setDisable(true);
+            }
+        }
     }
 
     @FXML

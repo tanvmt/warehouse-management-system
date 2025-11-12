@@ -29,6 +29,9 @@ service WarehouseService {
   rpc ImportProduct(TransactionRequest) returns (TransactionResponse);
   rpc ExportProduct(TransactionRequest) returns (TransactionResponse);
   rpc GetHistory(GetHistoryRequest) returns (HistoryResponse);
+//   Mới thêm
+  rpc GetSummaryReport(GetHistoryRequest) returns (SummaryReportResponse);
+  rpc GetDashboardData(EmptyRequest) returns (DashboardDataResponse);
 }
 
 message EmptyRequest {}
@@ -107,9 +110,12 @@ message UserListResponse {
 message AddUserRequest {
   string username = 1;
   string password = 2;
-  string role = 3; // "Manager" hoặc "Staff"
+  string role = 3;
   string fullName = 4;
   string email = 5;
+  string phone = 6;
+  string sex = 7;
+  string dateOfBirth = 8;
 }
 
 message SetUserActiveRequest {
@@ -186,9 +192,37 @@ message GetHistoryRequest {
   int32 pageSize = 2;
   string startDate = 3;
   string endDate = 4;
+  optional string username_filter = 5;
 }
 
 message HistoryResponse {
   repeated Transaction transactions = 1;
   PaginationInfo pagination = 2;
+}
+
+// Thêm mới
+message SummaryItem {
+    string productName = 1;
+    int32 totalImport = 2;
+    int32 totalExport = 3; 
+    int32 inventoryQuantity = 4;
+  }
+  
+message SummaryReportResponse {
+    repeated SummaryItem items = 1;
+}
+
+message LowStockItem {
+    string productName = 1;
+    int32 quantity = 2;
+}
+  
+message DashboardDataResponse {
+    int32 total_products = 1;
+    int32 total_stock = 2;
+    
+    optional int64 total_users = 3; // dành cho manager
+  
+    repeated LowStockItem low_stock_items = 4;
+    repeated Transaction recent_activities = 5; 
 }

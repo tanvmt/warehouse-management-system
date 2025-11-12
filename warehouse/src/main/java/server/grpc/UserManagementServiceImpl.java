@@ -26,7 +26,10 @@ public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserMan
                 request.getPassword(),
                 request.getRole(),
                 request.getFullName(),
-                request.getEmail()
+                request.getEmail(),
+                request.getPhone(),     
+                request.getSex(),       
+                request.getDateOfBirth()
         );
         ServiceResponse response = ServiceResponse.newBuilder()
                 .setSuccess(success)
