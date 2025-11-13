@@ -6,7 +6,11 @@ import com.group9.warehouse.grpc.PaginationInfo;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.exception.ResourceAlreadyExistsException;
+import server.exception.ResourceNotFoundException;
+import server.exception.ValidationException;
 import server.grpc.AuthServiceImpl;
+import server.mapper.UserMapper;
 import server.model.User;
 import server.repository.UserRepository;
 
@@ -17,9 +21,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
-    public UserService(UserRepository userRepository) {
+    private final UserMapper userMapper;
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public UserListResponse getPaginatedUsers(GetUsersRequest request) {
@@ -39,38 +44,35 @@ public class UserService {
                 .setTotalPages((int) totalPages)
                 .build();
 
-        UserListResponse.Builder responseBuilder = UserListResponse.newBuilder();
-        responseBuilder.setPagination(pagination);
+        UserListResponse.Builder builder = UserListResponse.newBuilder().setPagination(pagination);
+        users.forEach(u -> builder.addUsers(userMapper.convertUserToProfile(u)));
 
-        for (User u : users) {
-            responseBuilder.addUsers(AuthServiceImpl.convertUserToProfile(u));
-        }
-
-        log.info("UserService/getPaginatedUsers : Return {} users", users.size());
-        return responseBuilder.build();
+        return builder.build();
     }
 
-    public boolean addUser(String username, String password, String role, String fullName, String email, String phone, String sex, String dateOfBirth) {
+    public void addUser(String username, String password, String role, String fullName, String email, String phone, String sex, String dateOfBirth) {
         if (userRepository.existsByUsername(username)) {
-            log.info("UserService/addUser : Username {} was existed", username);
-            return false;
+            throw new ResourceAlreadyExistsException("Username '" + username + "' đã tồn tại.");
         }
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         User newUser = new User(username, hashedPassword, role, fullName, email, phone, sex, dateOfBirth, true);
 
+        boolean isSaved = userRepository.save(newUser);
+        if (!isSaved) {
+            throw new RuntimeException("Lỗi hệ thống: Không thể lưu dữ liệu xuống file JSON.");
+        }
         log.info("UserService/addUser : Add new user with username: {}", username);
-        return userRepository.save(newUser);
     }
 
-    public boolean setUserActiveStatus(String username, boolean isActive) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty()) {
-            log.info("UserService/setUserActiveStatus : Username {} was existed", username);
-            return false;
-        }
-        User user = userOptional.get();
+    public void setUserActiveStatus(String username, boolean isActive) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user: " + username));
+
         user.setActive(isActive);
-        log.info("UserService/setUserActiveStatus : Update user with username: {} to {}", username, isActive);
-        return userRepository.update(user);
+
+        boolean isSaved = userRepository.update(user);
+        if (!isSaved) {
+            throw new RuntimeException("Lỗi hệ thống: Không thể cập nhật dữ liệu.");
+        }
     }
 }

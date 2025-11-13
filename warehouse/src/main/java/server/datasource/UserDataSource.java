@@ -32,12 +32,9 @@ public class UserDataSource {
         }
     }
 
-    public void saveUsers(List<User> users) {
+    public void saveUsers(List<User> users) throws IOException {
         try (Writer writer = new FileWriter(USERS_FILE)) {
             gson.toJson(users, writer);
-            log.info("Luu vao file user thanh cong!!!");
-        } catch (Exception e) {
-            log.error("Lỗi khi lưu file user: " + e.getMessage());
         }
     }
 

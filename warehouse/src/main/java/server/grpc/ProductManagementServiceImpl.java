@@ -3,6 +3,7 @@ package server.grpc;
 import com.group9.warehouse.grpc.*;
 import io.grpc.stub.StreamObserver;
 import server.service.ProductService;
+import server.validator.ProductRequestValidator;
 
 public class ProductManagementServiceImpl extends ProductManagementServiceGrpc.ProductManagementServiceImplBase {
 
@@ -14,10 +15,11 @@ public class ProductManagementServiceImpl extends ProductManagementServiceGrpc.P
 
     @Override
     public void addProduct(AddProductRequest request, StreamObserver<ServiceResponse> responseObserver) {
-        boolean success = productService.addProduct(request.getProductId(), request.getProductName());
+        ProductRequestValidator.validateAddProduct(request);
+        productService.addProduct(request.getProductId(), request.getProductName());
         ServiceResponse response = ServiceResponse.newBuilder()
-                .setSuccess(success)
-                .setMessage(success ? "Thêm sản phẩm thành công" : "Thêm thất bại (ID sản phẩm đã tồn tại?)")
+                .setSuccess(true)
+                .setMessage("Thêm sản phẩm thành công")
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -25,10 +27,11 @@ public class ProductManagementServiceImpl extends ProductManagementServiceGrpc.P
 
     @Override
     public void updateProduct(UpdateProductRequest request, StreamObserver<ServiceResponse> responseObserver) {
-        boolean success = productService.updateProduct(request.getProductId(), request.getNewProductName());
+        ProductRequestValidator.validateUpdateProduct(request);
+        productService.updateProduct(request.getProductId(), request.getNewProductName());
         ServiceResponse response = ServiceResponse.newBuilder()
-                .setSuccess(success)
-                .setMessage(success ? "Cập nhật thành công" : "Cập nhật thất bại (không tìm thấy SP?)")
+                .setSuccess(true)
+                .setMessage("Cập nhật thành công")
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -36,10 +39,11 @@ public class ProductManagementServiceImpl extends ProductManagementServiceGrpc.P
 
     @Override
     public void setProductActiveStatus(SetProductActiveRequest request, StreamObserver<ServiceResponse> responseObserver) {
-        boolean success = productService.setProductActiveStatus(request.getProductId(), request.getIsActive());
+        ProductRequestValidator.validateSetProductActiveRequest(request);
+        productService.setProductActiveStatus(request.getProductId(), request.getIsActive());
         ServiceResponse response = ServiceResponse.newBuilder()
-                .setSuccess(success)
-                .setMessage(success ? "Cập nhật trạng thái thành công" : "Cập nhật thất bại (không tìm thấy SP?)")
+                .setSuccess(true)
+                .setMessage("Cập nhật trạng thái thành công" )
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

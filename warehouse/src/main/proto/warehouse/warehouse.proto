@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package warehouse;
+
+import "common/common.proto";
+import "product/product.proto"; // Cần import để dùng GetProductsRequest
+
+option java_multiple_files = true;
+option java_package = "com.group9.warehouse.grpc";
+option java_outer_classname = "WarehouseLogicProto";
+
+service WarehouseService {
+  rpc GetProducts(product.GetProductsRequest) returns (product.ProductListResponse);
+
+  rpc GetInventory(common.EmptyRequest) returns (InventoryResponse);
+  rpc ImportProduct(TransactionRequest) returns (TransactionResponse);
+  rpc ExportProduct(TransactionRequest) returns (TransactionResponse);
+  rpc GetHistory(GetHistoryRequest) returns (HistoryResponse);
+  rpc GetSummaryReport(GetHistoryRequest) returns (SummaryReportResponse);
+  rpc GetDashboardData(common.EmptyRequest) returns (DashboardDataResponse);
+}
+
+message InventoryItem {
+  string productName = 1;
+  int32 quantity = 2;
+  bool isActive = 3;
+}
+
+message InventoryResponse {
+  repeated InventoryItem items = 1;
+}
+
+message TransactionRequest {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message TransactionResponse {
+  bool success = 1;
+  string message = 2;
+  int32 newQuantity = 3;
+}
+
+message Transaction {
+  string timestamp = 1;
+  string clientName = 2;
+  string action = 3;
+  string product = 4;
+  int32 quantity = 5;
+  string result = 6;
+}
+
+message GetHistoryRequest {
+  int32 page = 1;
+  int32 pageSize = 2;
+  string startDate = 3;
+  string endDate = 4;
+  optional string username_filter = 5;
+}
+
+message HistoryResponse {
+  repeated Transaction transactions = 1;
+  common.PaginationInfo pagination = 2;
+}
+
+message SummaryItem {
+  string productName = 1;
+  int32 totalImport = 2;
+  int32 totalExport = 3;
+  int32 inventoryQuantity = 4;
+}
+
+message SummaryReportResponse {
+  repeated SummaryItem items = 1;
+}
+
+message LowStockItem {
+  string productName = 1;
+  int32 quantity = 2;
+}
+
+message DashboardDataResponse {
+  int32 total_products = 1;
+  int32 total_stock = 2;
+  optional int64 total_users = 3;
+
+  repeated LowStockItem low_stock_items = 4;
+  repeated Transaction recent_activities = 5;
+}

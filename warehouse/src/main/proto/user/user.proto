@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package user;
+
+import "common/common.proto";
+import "auth/auth.proto";
+
+option java_multiple_files = true;
+option java_package = "com.group9.warehouse.grpc";
+option java_outer_classname = "UserProto";
+
+service UserManagementService {
+  rpc GetUsers (GetUsersRequest) returns (UserListResponse);
+  rpc AddUser (AddUserRequest) returns (common.ServiceResponse);
+  rpc SetUserActiveStatus(SetUserActiveRequest) returns (common.ServiceResponse);
+}
+
+message GetUsersRequest {
+  int32 page = 1;
+  int32 pageSize = 2;
+  string searchTerm = 3;
+  optional common.BoolValue isActive = 4;
+}
+
+message UserListResponse {
+  repeated auth.UserProfile users = 1;
+  common.PaginationInfo pagination = 2;
+}
+
+message AddUserRequest {
+  string username = 1;
+  string password = 2;
+  string role = 3;
+  string fullName = 4;
+  string email = 5;
+  string phone = 6;
+  string sex = 7;
+  string dateOfBirth = 8;
+}
+
+message SetUserActiveRequest {
+  string username = 1;
+  bool isActive = 2;
+}

@@ -6,7 +6,7 @@
     "fullName": "Trần Văn Quản Lý",
     "email": "manager_a@company.com",
     "phone": "0901234567",
-    "sex": "Nam",
+    "sex": "Nữ",
     "dateOfBirth": "1990-05-15",
     "isActive": true
   },
@@ -50,7 +50,7 @@
     "fullName": "Ngô Tấn Sang",
     "email": "sangngo552004@gmail.com",
     "phone": "0374164299",
-    "sex": "Nam",
+    "sex": "Nữ",
     "dateOfBirth": "2004-05-05",
     "isActive": true
   },
@@ -100,6 +100,17 @@
     "role": "Manager",
     "fullName": "test6",
     "email": "test6",
+    "isActive": true
+  },
+  {
+    "username": "staff_F",
+    "hashedPassword": "$2a$10$05UBNxq8hRj/eC0jTpBIguS0ceMzZ74/akJEU4fci5RuLWb565I3S",
+    "role": "Staff",
+    "fullName": "Ngô Văn F",
+    "email": "staffF@gmail.com",
+    "phone": "0374164299",
+    "sex": "Nam",
+    "dateOfBirth": "2025-11-04",
     "isActive": true
   }
 ]

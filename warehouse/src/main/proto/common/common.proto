@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package common;
+
+option java_multiple_files = true;
+option java_package = "com.group9.warehouse.grpc";
+option java_outer_classname = "CommonProto";
+
+message EmptyRequest {}
+
+message ServiceResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message PaginationInfo {
+  int32 pageNumber = 1;
+  int32 pageSize = 2;
+  int32 totalPages = 3;
+  int64 totalElements = 4;
+}
+
+message BoolValue {
+  bool value = 1;
+}

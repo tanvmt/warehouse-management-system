@@ -3,6 +3,7 @@ package server.grpc;
 import com.group9.warehouse.grpc.*;
 import io.grpc.stub.StreamObserver;
 import server.service.UserService;
+import server.validator.UserRequestValidator;
 
 public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserManagementServiceImplBase {
 
@@ -14,6 +15,8 @@ public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserMan
 
     @Override
     public void getUsers(GetUsersRequest request, StreamObserver<UserListResponse> responseObserver) {
+        UserRequestValidator.validateGetUsersRequest(request);
+
         UserListResponse response = userService.getPaginatedUsers(request);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -21,7 +24,9 @@ public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserMan
 
     @Override
     public void addUser(AddUserRequest request, StreamObserver<ServiceResponse> responseObserver) {
-        boolean success = userService.addUser(
+        UserRequestValidator.validateAddUser(request);
+
+        userService.addUser(
                 request.getUsername(),
                 request.getPassword(),
                 request.getRole(),
@@ -32,8 +37,8 @@ public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserMan
                 request.getDateOfBirth()
         );
         ServiceResponse response = ServiceResponse.newBuilder()
-                .setSuccess(success)
-                .setMessage(success ? "Thêm user thành công" : "Thêm user thất bại (username đã tồn tại?)")
+                .setSuccess(true)
+                .setMessage("Thêm user thành công")
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -41,12 +46,14 @@ public class UserManagementServiceImpl extends UserManagementServiceGrpc.UserMan
 
     @Override
     public void setUserActiveStatus(SetUserActiveRequest request, StreamObserver<ServiceResponse> responseObserver) {
-        boolean success = userService.setUserActiveStatus(request.getUsername(), request.getIsActive());
+        UserRequestValidator.validateUpdateStatusUser(request);
 
+        userService.setUserActiveStatus(request.getUsername(), request.getIsActive());
         ServiceResponse response = ServiceResponse.newBuilder()
-                .setSuccess(success)
-                .setMessage(success ? "Cập nhật trạng thái thành công" : "Cập nhật thất bại (không tìm thấy user?)")
+                .setSuccess(true)
+                .setMessage("Cập nhật trạng thái thành công!")
                 .build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

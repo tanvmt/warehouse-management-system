@@ -1,8 +1,10 @@
 package server.repository;
 
 import server.datasource.UserDataSource;
+import server.model.Product;
 import server.model.User;
 
+import java.io.IOException;
 import java.util.ArrayList; // Thêm import này
 import java.util.LinkedHashMap; // Thêm import này
 import java.util.List;
@@ -26,13 +28,7 @@ public class UserRepository {
         }
     }
 
-    public List<User> findAll() {
-        return new ArrayList<>(userMap.values());
-    }
-
     public Optional<User> findByUsername(String username) {
-        if (username == null) return Optional.empty();
-
         return Optional.ofNullable(userMap.get(username));
     }
 
@@ -53,9 +49,9 @@ public class UserRepository {
     private boolean persist() {
         try {
             dataSource.saveUsers(new ArrayList<>(userMap.values()));
-            System.out.println("Đang lưu thay đổi vào users.json...");
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -65,19 +61,7 @@ public class UserRepository {
 
         Stream<User> stream = userMap.values().stream();
 
-        if (isActive != null) {
-            stream = stream.filter(u -> u.isActive() == isActive);
-        }
-
-        if (searchTerm != null && !searchTerm.isEmpty()) {
-            String lowerSearch = searchTerm.toLowerCase();
-            stream = stream.filter(u ->
-                    u.getUsername().toLowerCase().contains(lowerSearch) ||
-                            (u.getFullName() != null && u.getFullName().toLowerCase().contains(lowerSearch))
-            );
-        }
-
-        return stream
+        return filterUsers(stream, searchTerm, isActive)
                 .skip((long) (page - 1) * pageSize)
                 .limit(pageSize)
                 .collect(Collectors.toList());
@@ -85,18 +69,26 @@ public class UserRepository {
 
     public long countUsers(String searchTerm, Boolean isActive) {
         Stream<User> stream = userMap.values().stream();
+        return filterUsers(stream, searchTerm , isActive).count();
+    }
 
+    public int countTotalUsers() {
+        return userMap.size();
+    }
+
+    private Stream<User> filterUsers(Stream<User> stream, String searchTerm, Boolean isActive) {
         if (isActive != null) {
-            stream = stream.filter(u -> u.isActive() == isActive);
+            stream = stream.filter(p -> p.isActive() == isActive);
         }
-
         if (searchTerm != null && !searchTerm.isEmpty()) {
             String lowerSearch = searchTerm.toLowerCase();
-            stream = stream.filter(u ->
-                    u.getUsername().toLowerCase().contains(lowerSearch) ||
-                            (u.getFullName() != null && u.getFullName().toLowerCase().contains(lowerSearch))
+            stream = stream.filter(p ->
+                    p.getEmail().toLowerCase().contains(lowerSearch) ||
+                            p.getFullName().toLowerCase().contains(lowerSearch) ||
+                            p.getUsername().toLowerCase().contains(lowerSearch)
+
             );
         }
-        return stream.count();
+        return stream;
     }
 }

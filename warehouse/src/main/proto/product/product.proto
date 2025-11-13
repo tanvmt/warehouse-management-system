@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package product;
+
+import "common/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.group9.warehouse.grpc";
+option java_outer_classname = "ProductProto";
+
+service ProductManagementService {
+  rpc AddProduct(AddProductRequest) returns (common.ServiceResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (common.ServiceResponse);
+  rpc SetProductActiveStatus(SetProductActiveRequest) returns (common.ServiceResponse);
+}
+
+message Product {
+  string productId = 1;
+  string productName = 2;
+  bool isActive = 3;
+}
+
+message AddProductRequest {
+  string productId = 1;
+  string productName = 2;
+}
+
+message UpdateProductRequest {
+  string productId = 1;
+  string newProductName = 2;
+}
+
+message SetProductActiveRequest {
+  string productId = 1;
+  bool isActive = 2;
+}
+
+message GetProductsRequest {
+  int32 page = 1;
+  int32 pageSize = 2;
+  string searchTerm = 3;
+  optional common.BoolValue isActive = 4;
+}
+
+message ProductListResponse {
+  repeated Product products = 1;
+  common.PaginationInfo pagination = 2;
+}

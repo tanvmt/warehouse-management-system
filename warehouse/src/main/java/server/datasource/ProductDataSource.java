@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.model.Product;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +30,10 @@ public class ProductDataSource {
         }
     }
 
-    public void saveProducts(List<Product> products) {
+    public void saveProducts(List<Product> products) throws IOException {
         try (Writer writer = new FileWriter(PRODUCTS_FILE)) {
             gson.toJson(products, writer);
-            log.info("Luu vao file product thanh cong !!!");
-        } catch (Exception e) {
-            log.error("Lỗi khi lưu file sản phẩm: {}", e.getMessage());
+            log.info("Lưu file product thành công !!!");
         }
     }
 }

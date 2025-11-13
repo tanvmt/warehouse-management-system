@@ -32,7 +32,7 @@
   {
     "productId": "TN-05",
     "productName": "Tai nghe có dây",
-    "quantity": 0,
+    "quantity": 10,
     "isActive": true
   },
   {
@@ -70,5 +70,11 @@
     "productName": "Test4",
     "quantity": 0,
     "isActive": false
+  },
+  {
+    "productId": "SN-01",
+    "productName": "Màn hình SAMSUNG",
+    "quantity": 0,
+    "isActive": true
   }
 ]

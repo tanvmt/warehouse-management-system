@@ -1,138 +1,154 @@
 [
-    {
-      "timestamp": "2025-11-09T22:18:35.0000000",
-      "clientName": "manager_A",
-      "action": "IMPORT",
-      "product": "Chuột Logitech",
-      "quantity": 20,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-09T00:44:27.0000000",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Chuột Logitech",
-      "quantity": 40,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-09T00:44:17.0000000",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Chuột Logitech",
-      "quantity": 50,
-      "result": "Failed (Không đủ hàng tồn kho)"
-    },
-    {
-      "timestamp": "2025-11-09T00:43:28.0000000",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Bàn phím cơ",
-      "quantity": 10,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-09T00:40:26.0000000",
-      "clientName": "manager_A",
-      "action": "IMPORT",
-      "product": "Màn hình 32in",
-      "quantity": 20,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-09T00:39:48.0000000",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Chuột Logitech",
-      "quantity": 10,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-09T00:37:24.0000000",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Chuột Logitech",
-      "quantity": 10,
-      "result": "Failed (Sản phẩm không tồn tại)"
-    },
-    {
-      "timestamp": "2025-11-09T00:24:32.0000000",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Chuột Logitech",
-      "quantity": 10,
-      "result": "Failed (Sản phẩm không tồn tại)"
-    },
-    {
-      "timestamp": "2025-11-08T23:12:12.0000000",
-      "clientName": "staff_B",
-      "action": "IMPORT",
-      "product": "Chuột Logitech",
-      "quantity": 10,
-      "result": "Failed (Sản phẩm không tồn tại)"
-    },
-    {
-      "timestamp": "2025-11-08T23:07:55.0000000",
-      "clientName": "staff_B",
-      "action": "EXPORT",
-      "product": "Chuột Logitech",
-      "quantity": 10,
-      "result": "Failed (Sản phẩm không tồn tại)"
-    },
-    {
-      "timestamp": "2025-11-08T23:07:21.0000000",
-      "clientName": "staff_B",
-      "action": "IMPORT",
-      "product": "Chuột Logitech",
-      "quantity": 60,
-      "result": "Failed (Sản phẩm không tồn tại)"
-    },
-    {
-      "timestamp": "2025-11-08T17:30:00.0000000",
-      "clientName": "ClientApp_Init",
-      "action": "IMPORT",
-      "product": "Laptop Dell",
-      "quantity": 15,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-11T15:14:34.0303272",
-      "clientName": "manager_A",
-      "action": "IMPORT",
-      "product": "Bàn phím cơ",
-      "quantity": 10,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-11T15:14:43.6010018",
-      "clientName": "manager_A",
-      "action": "IMPORT",
-      "product": "Bàn phím cơ",
-      "quantity": 10,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-11T15:14:47.5051223",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Bàn phím cơ",
-      "quantity": 20,
-      "result": "Success"
-    },
-    {
-      "timestamp": "2025-11-11T15:14:55.9343717",
-      "clientName": "manager_A",
-      "action": "EXPORT",
-      "product": "Tai nghe không dây",
-      "quantity": 10,
-      "result": "Failed (Không đủ hàng tồn kho)"
-    },
-    {
-      "timestamp": "2025-11-11T15:15:27.9220057",
-      "clientName": "manager_A",
-      "action": "IMPORT",
-      "product": "Bàn phím cơ",
-      "quantity": 10,
-      "result": "Success"
-    }
+  {
+    "timestamp": "2025-11-09T22:18:35.0000000",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Chuột Logitech",
+    "quantity": 20,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:44:27.0000000",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 40,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:44:17.0000000",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 50,
+    "result": "Failed (Không đủ hàng tồn kho)"
+  },
+  {
+    "timestamp": "2025-11-09T00:43:28.0000000",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:40:26.0000000",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Màn hình 32in",
+    "quantity": 20,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:39:48.0000000",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-09T00:37:24.0000000",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
+    "timestamp": "2025-11-09T00:24:32.0000000",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
+    "timestamp": "2025-11-08T23:12:12.0000000",
+    "clientName": "staff_B",
+    "action": "IMPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
+    "timestamp": "2025-11-08T23:07:55.0000000",
+    "clientName": "staff_B",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
+    "timestamp": "2025-11-08T23:07:21.0000000",
+    "clientName": "staff_B",
+    "action": "IMPORT",
+    "product": "Chuột Logitech",
+    "quantity": 60,
+    "result": "Failed (Sản phẩm không tồn tại)"
+  },
+  {
+    "timestamp": "2025-11-08T17:30:00.0000000",
+    "clientName": "ClientApp_Init",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 15,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:34.0303272",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:43.6010018",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:47.5051223",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 20,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-11T15:14:55.9343717",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Tai nghe không dây",
+    "quantity": 10,
+    "result": "Failed (Không đủ hàng tồn kho)"
+  },
+  {
+    "timestamp": "2025-11-11T15:15:27.9220057",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Bàn phím cơ",
+    "quantity": 10,
+    "result": "Success"
+  },
+  {
+    "timestamp": "2025-11-13T22:13:24.8249661",
+    "clientName": "staff_E",
+    "action": "IMPORT",
+    "product": "KB-CO",
+    "quantity": 10,
+    "result": "FAILED: Sản phẩm đang bị vô hiệu hóa: KB-CO"
+  },
+  {
+    "timestamp": "2025-11-13T22:13:46.9414321",
+    "clientName": "staff_E",
+    "action": "IMPORT",
+    "product": "Tai nghe có dây",
+    "quantity": 10,
+    "result": "SUCCESS"
+  }
 ]

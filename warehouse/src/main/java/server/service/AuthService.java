@@ -1,60 +1,55 @@
 package server.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+
 import com.group9.warehouse.grpc.UpdateProfileRequest;
+import com.group9.warehouse.grpc.UserProfile;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import server.datasource.UserDataSource;
+import server.exception.AuthenticationException;
+import server.exception.AuthorizationException;
+import server.exception.ResourceNotFoundException;
+
+import server.mapper.UserMapper;
 import server.model.User;
 import server.repository.UserRepository;
 
-import java.util.Date;
-import java.util.Optional;
 
 public class AuthService {
 
-    public static final String JWT_SECRET = "DayLaMotBiMatRatRatLao";
-    public static final Algorithm JWT_ALGORITHM = Algorithm.HMAC256(JWT_SECRET);
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
-    public Optional<User> validateUser(String username, String plainPassword) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty()) {
-            log.info("AuthService/Login: Username {} wasn't existed", username);
-            return Optional.empty();
-        }
-        User user = userOptional.get();
+    public User validateUser(String username, String plainPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
 
         if (!user.isActive()) {
-            log.info("AuthService/Login:  Your account {} is banned.", username);
-            return Optional.empty();
+            throw new AuthorizationException("Tài khoản đã bị khóa, vui lòng liên hệ Admin");
         }
 
         if (!BCrypt.checkpw(plainPassword, user.getHashedPassword())) {
-            log.info("AuthService/Login : Password is not correct.");
-            return Optional.empty();
+            throw new AuthenticationException("Sai mật khẩu");
         }
-        return userOptional;
+        return user;
     }
 
-    public Optional<User> getUserProfile(String username) {
-        return userRepository.findByUsername(username);
+    public UserProfile getUserProfile(String username) {
+        User user =  userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
+        return userMapper.convertUserToProfile(user);
     }
 
     public boolean updateUserProfile(String username, UpdateProfileRequest request) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty()) {
-            log.info("AuthService/updateUserProfile: Username {} wasn't existed.", username);
-            return false;
-        }
-        User user = userOptional.get();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
+
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
@@ -64,32 +59,18 @@ public class AuthService {
         return userRepository.update(user);
     }
 
-    public boolean changePassword(String username, String oldPassword, String newPassword) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty()) {
-            log.info("AuthService/changePassword : Username {} wasn't existed.", username);
-            return false;
-        }
-        User user = userOptional.get();
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
 
         if (!BCrypt.checkpw(oldPassword, user.getHashedPassword())) {
-            log.info("AuthService/changePassword : Old password is not correct.");
-            return false;
+            throw new AuthenticationException("Mật khẩu cũ không chính xác");
         }
 
-        String newHashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-        user.setHashedPassword(newHashedPassword);
-        log.info("AuthService/changePassword : Password has been changed successfully.");
-        return userRepository.update(user);
+        user.setHashedPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        if (!userRepository.update(user)) {
+            throw new RuntimeException("Lỗi hệ thống: Không thể đổi mật khẩu");
+        }
     }
 
-    public String generateJwtToken(User user) {
-        long EXPIRATION_TIME_MS = 86_400_000;
-        return JWT.create()
-                .withSubject(user.getUsername())
-                .withClaim("role", user.getRole())
-                .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
-                .sign(JWT_ALGORITHM);
-    }
 }

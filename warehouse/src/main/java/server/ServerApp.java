@@ -27,11 +27,16 @@ public class ServerApp {
 
 
             Server server = ServerBuilder.forPort(PORT)
+                    // 1. Đăng ký Global Exception Handler
+                    .intercept(container.getGlobalExceptionHandlerInterceptor())
+                    // 2. Đăng ký Auth Interceptor (Kiểm tra token trước khi vào service)
+                    .intercept(container.getAuthInterceptor())
+                    // 3. Đăng ký các Service
                     .addService(container.getAuthServiceImpl())
                     .addService(container.getUserManagementServiceImpl())
                     .addService(container.getProductManagementServiceImpl())
                     .addService(container.getWarehouseServiceImpl())
-                    .intercept(container.getAuthInterceptor())
+
                     .executor(Executors.newFixedThreadPool(16))
                     .build();
 

@@ -5,11 +5,18 @@ import com.group9.warehouse.grpc.PaginationInfo;
 import com.group9.warehouse.grpc.ProductListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.exception.ResourceAlreadyExistsException;
+import server.exception.ResourceNotFoundException;
+import server.exception.ValidationException;
+import server.mapper.ProductMapper;
 import server.model.Product;
+import server.model.Transaction;
 import server.repository.ProductRepository;
+import server.repository.TransactionRepository;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -17,7 +24,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final TransactionRepository transactionRepository;
     private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+    private final ProductMapper productMapper;
 
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock(true);
 
@@ -25,137 +34,130 @@ public class ProductService {
     private final Lock writeLock = rwLock.writeLock();
 
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository,
+                          TransactionRepository transactionRepository,
+                          ProductMapper productMapper) {
+        this.transactionRepository = transactionRepository;
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
-    public static class TransactionResponse {
-        public final boolean success;
-        public final String message;
-        public final int newQuantity;
-
-        public TransactionResponse(boolean success, String message, int newQuantity) {
-            this.success = success;
-            this.message = message;
-            this.newQuantity = newQuantity;
-        }
-    }
-
-    public boolean addProduct(String productId, String productName) {
+    public void addProduct(String productId, String productName) {
         writeLock.lock();
         log.info("Block : add Product");
         try {
             if (productRepository.existsById(productId)) {
-                log.info("ProductService/addProduct : Product was existed with ID: {}", productId);
-                return false; // Trùng ID
+                throw new ResourceAlreadyExistsException("Sản phẩm ID " + productId + " đã tồn tại.");
             }
             Product newProduct = new Product(productId, productName, 0, true);
+
+            // Save & Check System Error
+            if (!productRepository.save(newProduct)) {
+                throw new RuntimeException("Lỗi hệ thống: Không thể lưu sản phẩm.");
+            }
             log.info("ProductService/addProduct : Add new product with ID: {}", productId);
-            return productRepository.save(newProduct);
         } finally {
             writeLock.unlock();
             log.info("Unlock: add Product");
         }
     }
 
-    public boolean updateProduct(String productId, String newProductName) {
+    public void updateProduct(String productId, String newProductName) {
         writeLock.lock();
         log.info("Block : update Product");
         try {
-            Optional<Product> productOptional = productRepository.findById_NoLock(productId);
-            if (productOptional.isEmpty()) {
-                log.info("ProductService/updateProduct : Product was existed with ID: {}", productId);
-                return false;
-            }
-            Product product = productOptional.get();
+            Product product = productRepository.findById_NoLock(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm ID: " + productId));
+
             product.setProductName(newProductName);
+            if (!productRepository.update(product)) {
+                throw new RuntimeException("Lỗi hệ thống: Không thể cập nhật sản phẩm.");
+            }
             log.info("ProductService/updateProduct : Update product with ID: {} to {}", productId, newProductName);
-            return productRepository.update(product);
         } finally {
             writeLock.unlock();
             log.info("UnBlock : update Product");
         }
     }
 
-    public boolean setProductActiveStatus(String productId, boolean isActive) {
+    public void setProductActiveStatus(String productId, boolean isActive) {
         writeLock.lock();
         log.info("Block : set status to Product");
         try {
-            Optional<Product> productOptional = productRepository.findById_NoLock(productId);
-            if (productOptional.isEmpty()) {
-                log.info("ProductService/setProductActiveStatus : Product was existed with ID: {}", productId);
-                return false;
-            }
-            Product product = productOptional.get();
+            Product product = productRepository.findById_NoLock(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm ID: " + productId));
+
             product.setActive(isActive);
+            if (!productRepository.update(product)) {
+                throw new RuntimeException("Lỗi hệ thống: Không thể cập nhật trạng thái.");
+            }
             log.info("ProductService/setProductActiveStatus : Update product with ID: {} to {}", productId, isActive);
-            return productRepository.update(product);
+
         } finally {
             writeLock.unlock();
             log.info("UnBlock : set status to Product");
         }
     }
 
-    public TransactionResponse importProduct(String productId, int quantity) {
+    public int importProduct(String productId, int quantity, String clientName) {
         writeLock.lock();
         log.info("Block : import Product");
         try {
-            if (quantity <= 0) {
-                log.info("ProductService/importProduct : Quantity must be > 0");
-                return new TransactionResponse(false, "Quantity must be > 0", -1);
-            }
-            Optional<Product> productOptional = productRepository.findById_NoLock(productId);
-            if (productOptional.isEmpty()) {
-                log.info("ProductService/importProduct : Product wasn't existed with ID: {}", productId);
-                return new TransactionResponse(false, "Product wasn't existed", -1);
-            }
+            if (quantity <= 0) throw new ValidationException("Số lượng nhập phải > 0");
 
-            Product product = productOptional.get();
-            if (!product.isActive()) {
-                log.info("ProductService/importProduct : Product was banned with ID: {}", productId);
-                return new TransactionResponse(false, "Product was banned ", product.getQuantity());
-            }
+            Product product = productRepository.findById_NoLock(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm không tồn tại: " + productId));
+
+            if (!product.isActive()) throw new ValidationException("Sản phẩm đang bị vô hiệu hóa: " + productId);
 
             product.setQuantity(product.getQuantity() + quantity);
             productRepository.update(product);
+
+            logTransaction(clientName, "IMPORT", product.getProductName(), quantity, "SUCCESS");
             log.info("ProductService/importProduct : Import quantity of product with ID: {} to {}", productId, product.getQuantity());
-            return new TransactionResponse(true, "Import successfully!!!", product.getQuantity());
+            return product.getQuantity();
+
+        } catch (Exception e) {
+            if (e instanceof ValidationException || e instanceof ResourceNotFoundException) {
+                logTransaction(clientName, "IMPORT", productId, quantity, "FAILED: " + e.getMessage());
+            }
+            throw e;
         } finally {
             writeLock.unlock();
             log.info("UnBlock : import Product");
         }
     }
 
-    public TransactionResponse exportProduct(String productId, int quantity) {
+    public int exportProduct(String productId, int quantity, String clientName) {
         writeLock.lock();
         log.info("Block : export Product");
         try {
-            if (quantity <= 0) {
-                log.info("ProductService/exportProduct  : Quantity must be > 0");
-                return new TransactionResponse(false, "Quantity must be > 0", -1);
-            }
-            Optional<Product> productOptional = productRepository.findById_NoLock(productId); // Dùng hàm nội bộ
-            if (productOptional.isEmpty()) {
-                log.info("ProductService/exportProduct  : Product wasn't existed with ID: {}", productId);
-                return new TransactionResponse(false, "Product wasn't existed", -1);
-            }
+            if (quantity <= 0) throw new ValidationException("Số lượng xuất phải > 0");
 
-            Product product = productOptional.get();
-            if (!product.isActive()) {
-                log.info("ProductService/exportProduct  : Product was banned with ID: {}", productId);
-                return new TransactionResponse(false, "Product was banned", product.getQuantity());
-            }
+            Product product = productRepository.findById_NoLock(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm không tồn tại: " + productId));
+
+            if (!product.isActive()) throw new ValidationException("Sản phẩm đang bị vô hiệu hóa.");
 
             if (product.getQuantity() < quantity) {
-                log.info("ProductService/exportProduct  : Not enough quantity of product with ID: {}", productId);
-                return new TransactionResponse(false, "Not enough quantity of product", product.getQuantity());
+                throw new ValidationException("Không đủ hàng trong kho (Còn: " + product.getQuantity() + ")");
             }
 
             product.setQuantity(product.getQuantity() - quantity);
-            productRepository.update(product);
-            log.info("ProductService/exportProduct  : Export quantity of product with ID: {} to {}", productId, product.getQuantity());
-            return new TransactionResponse(true, "Export successfully!!!", product.getQuantity());
-        } finally {
+            if (!productRepository.update(product)) {
+                throw new RuntimeException("Lỗi hệ thống: Không thể cập nhật kho.");
+            }
+
+            logTransaction(clientName, "EXPORT", product.getProductName(), quantity, "SUCCESS");
+            return product.getQuantity();
+
+        } catch (Exception e) {
+            if (e instanceof ValidationException || e instanceof ResourceNotFoundException) {
+                logTransaction(clientName, "EXPORT", productId, quantity, "FAILED: " + e.getMessage());
+            }
+            throw e;
+        }
+        finally {
             writeLock.unlock();
             log.info("UnBlock : export Product");
         }
@@ -185,15 +187,9 @@ public class ProductService {
             ProductListResponse.Builder responseBuilder = ProductListResponse.newBuilder();
             responseBuilder.setPagination(pagination);
 
-            for (Product p : products) {
-                responseBuilder.addProducts(
-                        com.group9.warehouse.grpc.Product.newBuilder()
-                                .setProductId(p.getProductId())
-                                .setProductName(p.getProductName())
-                                .setIsActive(p.isActive())
-                                .build()
-                );
-            }
+            products.stream().
+                    map(productMapper::convertProductToGrpcProduct).
+                    forEach(responseBuilder::addProducts);
             log.info("ProductService/getPaginatedProducts : Return {} products", products.size());
             return responseBuilder.build();
         } finally {
@@ -202,21 +198,7 @@ public class ProductService {
         }
     }
 
-    public Optional<Product> getProductById(String productId) {
-        readLock.lock();
-        log.info("Block : get Product by ID");
-        try {
-            if (!productRepository.existsById(productId)) {
-                log.info("ProductService/getProductById : Product was not existed with ID: {}", productId);
-                return Optional.empty();
-            }
-            log.info("ProductService/getProductById : Return product with ID: {}", productId);
-            return productRepository.findById(productId);
-        } finally {
-            readLock.unlock();
-            log.info("UnBlock : get Product by ID");
-        }
-    }
+
 
     public List<Product> getAllProducts() {
         readLock.lock();
@@ -227,6 +209,18 @@ public class ProductService {
         } finally {
             readLock.unlock();
             log.info("UnBlock : get All Products");
+        }
+    }
+
+    private void logTransaction(String clientName, String action, String productName, int quantity, String result) {
+        Transaction t = new Transaction(
+                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+                clientName != null ? clientName : "Unknown",
+                action, productName, quantity, result
+        );
+
+        if(!transactionRepository.save(t)){
+            throw new RuntimeException("Lỗi hệ thống: Không thể lưu giao dịch.");
         }
     }
 }

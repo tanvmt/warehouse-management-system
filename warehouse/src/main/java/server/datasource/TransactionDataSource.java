@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.model.Transaction;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +30,9 @@ public class TransactionDataSource {
         }
     }
 
-    public void saveTransactions(List<Transaction> transactions) {
+    public void saveTransactions(List<Transaction> transactions) throws IOException {
         try (Writer writer = new FileWriter(TRANSACTION_FILE)) {
             gson.toJson(transactions, writer);
-            log.info("Luu vao file giao dich thanh cong");
-        } catch (Exception e) {
-            log.error("Lỗi khi lưu file giao dịch: {}", e.getMessage());
         }
     }
 }
