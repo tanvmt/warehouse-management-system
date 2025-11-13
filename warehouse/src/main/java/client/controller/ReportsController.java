@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType; 
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javafx.scene.CacheHint;
+
+import client.util.NotificationUtil;
 
 public class ReportsController {
 
@@ -113,7 +115,7 @@ public class ReportsController {
         List<ProductSummary> dataToExport = summaryTable.getItems();
         
         if (dataToExport == null || dataToExport.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Không có dữ liệu", "Không có dữ liệu để xuất.");
+            NotificationUtil.showNotification(exportPdfButton, "Không có dữ liệu", "Không có dữ liệu để xuất.", AlertType.WARNING);
             return;
         }
 
@@ -140,11 +142,11 @@ public class ReportsController {
                                           inventoryPieChart,
                                           activityBarChart);
                 
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", 
-                          "Đã xuất báo cáo PDF thành công:\n" + file.getAbsolutePath());
+                NotificationUtil.showNotification(exportPdfButton, "Thành công", 
+                          "Đã xuất báo cáo PDF thành công:\n" + file.getAbsolutePath(), AlertType.INFORMATION);
             } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi Xuất PDF", 
-                          "Đã xảy ra lỗi khi tạo file PDF: " + e.getMessage());
+                NotificationUtil.showNotification(exportPdfButton, "Lỗi Xuất PDF", 
+                          "Đã xảy ra lỗi khi tạo file PDF: " + e.getMessage(), AlertType.ERROR);
                 e.printStackTrace();
             }
         }
@@ -204,15 +206,7 @@ public class ReportsController {
         } catch (Exception e) {
             System.out.println("Error loading summary report data: " + e.getMessage());
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi Tải Báo Cáo", "Không thể tải dữ liệu báo cáo từ server: " + e.getMessage());
+            NotificationUtil.showNotification(filterButton, "Lỗi Tải Báo Cáo", "Không thể tải dữ liệu báo cáo từ server: " + e.getMessage(), AlertType.ERROR);
         }
-    }
-
-    private void showAlert(Alert.AlertType alertType, String title, String content) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

@@ -52,6 +52,7 @@ public class WarehouseController {
         GetProductsRequest request = GetProductsRequest.newBuilder()
             .setPage(1)
             .setPageSize(100)
+            .setIsActive(BoolValue.newBuilder().setValue(true).build())
             .build();
         ProductListResponse response = warehouseStub.getProducts(request);
 

@@ -13,11 +13,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+
+import client.util.NotificationUtil;
 
 public class ProfileController implements Initializable {
 
@@ -56,7 +59,7 @@ public class ProfileController implements Initializable {
         try {
             String username = SessionManager.getUsername();
             if (username == null || username.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi", "Không tìm thấy phiên đăng nhập.");
+                NotificationUtil.showNotification(lblUsername, "Lỗi", "Không tìm thấy phiên đăng nhập.", AlertType.ERROR);
                 return;
             }
 
@@ -68,12 +71,12 @@ public class ProfileController implements Initializable {
                 this.currentUserProfile = convertGrpcToLocalProfile(response.getProfile());
                 populateFields(this.currentUserProfile);
             } else {
-                showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tải thông tin cá nhân: " + response.getMessage());
+                NotificationUtil.showNotification(lblUsername, "Lỗi", "Không thể tải thông tin cá nhân: " + response.getMessage(), AlertType.ERROR);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi khi tải dữ liệu: " + e.getMessage());
+            NotificationUtil.showNotification(lblUsername, "Lỗi", "Lỗi khi tải dữ liệu: " + e.getMessage(), AlertType.ERROR);
         }
     }
 
@@ -130,7 +133,7 @@ public class ProfileController implements Initializable {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi khi cập nhật: " + e.getMessage());
+                NotificationUtil.showNotification(btnEditSave, "Lỗi", "Lỗi khi cập nhật: " + e.getMessage(), AlertType.ERROR);
             }
         }
     }
@@ -229,14 +232,6 @@ public class ProfileController implements Initializable {
         dpDateOfBirth.setDisable(!editable);
     }
     
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     private void setStatusLabel(Label label, String text, boolean isSuccess) {
         label.setText(text);
         if (isSuccess) {

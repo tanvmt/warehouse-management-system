@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.application.Platform;
 import javafx.scene.layout.VBox;
@@ -27,6 +26,8 @@ import client.model.UserProfile;
 import com.group9.warehouse.grpc.*; 
 import client.service.GrpcClientService;
 import client.service.SessionManager;
+
+import client.util.NotificationUtil; 
 
 public class UserManagementController {
 
@@ -142,9 +143,9 @@ public class UserManagementController {
                 .setSearchTerm(searchTerm);
 
             if ("Kích hoạt".equals(status)) {
-                requestBuilder.setIsActive(BoolValue.newBuilder().setValue(true).build()); //
+                requestBuilder.setIsActive(BoolValue.newBuilder().setValue(true).build()); 
             } else if ("Vô hiệu hóa".equals(status)) {
-                requestBuilder.setIsActive(BoolValue.newBuilder().setValue(false).build()); //
+                requestBuilder.setIsActive(BoolValue.newBuilder().setValue(false).build()); 
             }
 
             GetUsersRequest request = requestBuilder.build();
@@ -173,7 +174,7 @@ public class UserManagementController {
 
         } catch (Exception e) {
             System.out.println("Error loading user list: " + e.getMessage());
-            showAlert("Lỗi Tải Danh Sách", "Không thể tải danh sách người dùng: " + e.getMessage(), AlertType.ERROR);
+            NotificationUtil.showNotification(usersTable, "Lỗi Tải Danh Sách", "Không thể tải danh sách người dùng: " + e.getMessage(), AlertType.ERROR);
         }
     }
     
@@ -227,7 +228,7 @@ public class UserManagementController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Lỗi Giao Diện", "Không thể mở biểu mẫu thêm người dùng.", AlertType.ERROR);
+            NotificationUtil.showNotification(showAddUserDialogButton, "Lỗi Giao Diện", "Không thể mở biểu mẫu thêm người dùng.", AlertType.ERROR);
         }
     }
 
@@ -245,12 +246,12 @@ public class UserManagementController {
         UserProfile selectedUser = usersTable.getSelectionModel().getSelectedItem();
         
         if (selectedUser == null) {
-            showAlert("Chưa chọn User", "Vui lòng chọn một người dùng để thay đổi trạng thái.", AlertType.WARNING);
+            NotificationUtil.showNotification(usersTable, "Chưa chọn User", "Vui lòng chọn một người dùng để thay đổi trạng thái.", AlertType.WARNING);
             return;
         }
 
         if (selectedUser.getUsername().equals(SessionManager.getUsername())) {
-             showAlert("Lỗi", "Bạn không thể tự thay đổi trạng thái của chính mình.", AlertType.ERROR);
+             NotificationUtil.showNotification(usersTable, "Lỗi", "Bạn không thể tự thay đổi trạng thái của chính mình.", AlertType.ERROR);
              return;
         }
 
@@ -264,23 +265,13 @@ public class UserManagementController {
 
             if (response.getSuccess()) {
                 String statusText = isActive ? "kích hoạt" : "vô hiệu hóa";
-                showAlert("Thành công", "Đã " + statusText + " user " + selectedUser.getUsername(), AlertType.INFORMATION);
+                NotificationUtil.showNotification(usersTable, "Thành công", "Đã " + statusText + " user " + selectedUser.getUsername(), AlertType.INFORMATION);
                 loadUserList();
             } else {
-                showAlert("Lỗi", "Lỗi cập nhật trạng thái: " + response.getMessage(), AlertType.ERROR);
+                NotificationUtil.showNotification(usersTable, "Lỗi", "Lỗi cập nhật trạng thái: " + response.getMessage(), AlertType.ERROR);
             }
         } catch (Exception e) {
-            showAlert("Lỗi gRPC", "Lỗi gRPC: " + e.getMessage(), AlertType.ERROR);
+            NotificationUtil.showNotification(usersTable, "Lỗi gRPC", "Lỗi gRPC: " + e.getMessage(), AlertType.ERROR);
         }
-    }
-
-    private void showAlert(String title, String message, AlertType alertType) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(alertType);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
     }
 }

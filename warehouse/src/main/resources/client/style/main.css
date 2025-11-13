@@ -486,3 +486,88 @@
     -fx-border-radius: 8;
 }
 
+/* SỬA LẠI TRONG main.css */
+
+/* ================================================= */
+/* CẤU HÌNH HIỂN THỊ CHUNG CHO TOAST (MODERN LOOK)  */
+/* ================================================= */
+
+/* Áp dụng hiệu ứng và di chuyển cho cửa sổ popup gốc */
+.notification-popup {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.2, 0, 0); 
+    -fx-opacity: 0.98;
+
+    /* Các style test di chuyển của bạn sẽ hoạt động ở đây */
+    -fx-translate-x: -100px;
+    -fx-translate-y: 100px;
+}
+
+/* * Áp dụng NỀN, VIỀN, BO GÓC cho .pane BÊN TRONG
+ */
+.notification-popup > .pane {
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    
+    /* Style test viền tím của bạn sẽ hoạt động ở đây */
+    -fx-border-width: 5px; 
+    -fx-border-color: purple;
+}
+
+
+/* Tùy chỉnh Tiêu đề (Giữ nguyên, có thể đã đúng) */
+.notification-popup .title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgb(255, 0, 0); 
+}
+
+/* Tùy chỉnh Nội dung (Giữ nguyên) */
+.notification-popup .label {
+    -fx-font-size: 12px;
+}
+
+/* Tùy chỉnh nút Đóng (Giữ nguyên) */
+.notification-popup .close-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+.notification-popup .close-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ================================================= */
+/* TÙY CHỈNH MÀU SẮC DỰA TRÊN LOẠI THÔNG BÁO */
+/* ================================================= */
+
+/* Thêm "> .pane" vào tất cả các loại thông báo */
+
+.notification-popup.information > .pane {
+    -fx-background-color: #38C7A5; /* Màu Xanh Mint */
+}
+.notification-popup.information .label {
+    -fx-text-fill: white;
+}
+/* ... */
+
+
+.notification-popup.error > .pane {
+    -fx-background-color: #E74C3C; /* Màu Đỏ đậm */
+}
+.notification-popup.error .title {
+    -fx-text-fill: white;
+}
+.notification-popup.error .label {
+    -fx-text-fill: #f5f5f5;
+}
+
+
+.notification-popup.warning > .pane {
+    -fx-background-color: #F39C12; /* Màu Vàng cam */
+}
+.notification-popup.warning .title,
+.notification-popup.warning .label {
+    -fx-text-fill: #333333; /* Chữ màu tối để nổi bật */
+}
+.notification-popup.warning .close-button {
+    -fx-text-fill: #333333;
+}

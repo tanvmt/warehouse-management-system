@@ -55,7 +55,12 @@ public class LoginController {
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Hệ thống Quản lý Kho");
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            
+            String cssPath = getClass().getResource("/client/style/main.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+            
+            stage.setScene(scene);
             stage.show();
             
             stage.setOnCloseRequest(e -> {

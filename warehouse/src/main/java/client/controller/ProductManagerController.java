@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.application.Platform;
 import javafx.scene.layout.VBox;
@@ -27,6 +26,8 @@ import java.io.IOException;
 import client.model.Product;
 import com.group9.warehouse.grpc.*;
 import client.service.GrpcClientService;
+
+import client.util.NotificationUtil; 
 
 public class ProductManagerController {
 
@@ -152,7 +153,7 @@ public class ProductManagerController {
 
         } catch (Exception e) {
             System.out.println("Error loading product list: " + e.getMessage());
-            showAlert("Lỗi Tải Danh Sách", "Không thể tải danh sách sản phẩm: " + e.getMessage(), AlertType.ERROR);
+            NotificationUtil.showNotification(productsTable, "Lỗi Tải Danh Sách", "Không thể tải danh sách sản phẩm: " + e.getMessage(), AlertType.ERROR);
         }
     }
 
@@ -207,7 +208,7 @@ public class ProductManagerController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Lỗi Giao Diện", "Không thể mở biểu mẫu thêm sản phẩm.", AlertType.ERROR);
+            NotificationUtil.showNotification(showAddProductDialogButton, "Lỗi Giao Diện", "Không thể mở biểu mẫu thêm sản phẩm.", AlertType.ERROR);
         }
     }
 
@@ -225,7 +226,7 @@ public class ProductManagerController {
         Product selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         
         if (selectedProduct == null) {
-            showAlert("Chưa chọn sản phẩm", "Vui lòng chọn một sản phẩm để thay đổi trạng thái.", AlertType.WARNING);
+            NotificationUtil.showNotification(productsTable, "Chưa chọn sản phẩm", "Vui lòng chọn một sản phẩm để thay đổi trạng thái.", AlertType.WARNING);
             return;
         }
 
@@ -239,23 +240,13 @@ public class ProductManagerController {
 
             if (response.getSuccess()) {
                 String statusText = isActive ? "kích hoạt" : "vô hiệu hóa";
-                showAlert("Thành công", "Đã " + statusText + " sản phẩm " + selectedProduct.getProductId(), AlertType.INFORMATION);
-                loadProductList(); // Tải lại danh sách
+                NotificationUtil.showNotification(productsTable, "Thành công", "Đã " + statusText + " sản phẩm " + selectedProduct.getProductId(), AlertType.INFORMATION);
+                loadProductList(); 
             } else {
-                showAlert("Lỗi", "Lỗi cập nhật trạng thái: " + response.getMessage(), AlertType.ERROR);
+                NotificationUtil.showNotification(productsTable, "Lỗi", "Lỗi cập nhật trạng thái: " + response.getMessage(), AlertType.ERROR);
             }
         } catch (Exception e) {
-            showAlert("Lỗi gRPC", "Lỗi gRPC: " + e.getMessage(), AlertType.ERROR);
+            NotificationUtil.showNotification(productsTable, "Lỗi gRPC", "Lỗi gRPC: " + e.getMessage(), AlertType.ERROR);
         }
-    }
-
-    private void showAlert(String title, String message, AlertType alertType) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(alertType);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
     }
 }

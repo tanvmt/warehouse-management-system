@@ -8,7 +8,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -18,6 +18,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+import client.util.NotificationUtil; 
 
 public class TransactionHistoryController {
 
@@ -99,7 +101,7 @@ public class TransactionHistoryController {
         LocalDate endDate = endDatePicker.getValue();
 
         if (startDate == null || endDate == null) {
-            showAlert("Lỗi Lọc", "Ngày bắt đầu và ngày kết thúc không được rỗng.", Alert.AlertType.ERROR);
+            NotificationUtil.showNotification(filterButton, "Lỗi Lọc", "Ngày bắt đầu và ngày kết thúc không được rỗng.", AlertType.ERROR);
             return;
         }
 
@@ -130,7 +132,7 @@ public class TransactionHistoryController {
 
         } catch (Exception e) {
             System.err.println("Lỗi tải Lịch sử Giao dịch: " + e.getMessage());
-            showAlert("Lỗi gRPC", "Không thể tải lịch sử: " + e.getMessage(), Alert.AlertType.ERROR);
+            NotificationUtil.showNotification(filterButton, "Lỗi gRPC", "Không thể tải lịch sử: " + e.getMessage(), AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -140,16 +142,6 @@ public class TransactionHistoryController {
             paginationLabel.setText(String.format("Trang %d / %d", currentPage, totalPages));
             prevButton.setDisable(currentPage <= 1);
             nextButton.setDisable(currentPage >= totalPages);
-        });
-    }
-
-    private void showAlert(String title, String message, Alert.AlertType alertType) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(alertType);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
         });
     }
 }
