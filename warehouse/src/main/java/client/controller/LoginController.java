@@ -13,6 +13,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 import client.service.GrpcClientService;
+import client.service.SessionManager;
+
+import javafx.application.Platform;
+import javafx.stage.WindowEvent;
 
 public class LoginController {
 
@@ -26,6 +30,15 @@ public class LoginController {
     @FXML
     public void initialize() {
         this.authService = new AuthService();
+        Platform.runLater(() -> {
+            Stage stage = (Stage) statusLabel.getScene().getWindow();
+            
+            stage.setOnShowing(event -> {
+                System.out.println("Login window is showing. Clearing fields.");
+                statusLabel.setText(""); 
+                passwordField.clear();
+            });
+        });
     }
 
     @FXML
@@ -39,7 +52,6 @@ public class LoginController {
         System.out.println("Login success: " + loginSuccess);
         if (loginSuccess) {
             System.out.print("Đăng nhập thành công");
-            statusLabel.setText("Đăng nhập thành công!");
             loadMainAppWindow();
             ipField.getScene().getWindow().hide();
         } else {
@@ -61,10 +73,14 @@ public class LoginController {
             scene.getStylesheets().add(cssPath);
             
             stage.setScene(scene);
+            Stage loginStage = (Stage) ipField.getScene().getWindow();
+            SessionManager.startInactivityTimer(stage, loginStage);
             stage.show();
             
             stage.setOnCloseRequest(e -> {
+                SessionManager.clearSession(); 
                 GrpcClientService.getInstance().close();
+                loginStage.show();
             });
             
         } catch (IOException e) {
