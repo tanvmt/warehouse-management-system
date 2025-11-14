@@ -571,3 +571,57 @@
 .notification-popup.warning .close-button {
     -fx-text-fill: #333333;
 }
+
+/* ================================================= */
+/* DIALOG CẢNH BÁO ĐĂNG XUẤT TÙY CHỈNH
+/* ================================================= */
+
+/* Áp dụng cho toàn bộ khung dialog */
+.logout-warning-dialog {
+    -fx-font-family: 'Inter', 'Segoe UI', system-ui;
+    -fx-background-color: #ffffff;
+    -fx-border-width: 4px;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);
+
+    -fx-pref-width: 450px;
+    -fx-pref-height: 200px;
+}
+
+/* Khu vực chứa tiêu đề và icon */
+.logout-warning-dialog .header-panel {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+/* Tiêu đề (ví dụ: "Bạn sẽ bị đăng xuất...") */
+.logout-warning-dialog .header-panel .label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d90429; /* Màu đỏ lỗi */
+}
+
+/* Nội dung (ví dụ: "Vui lòng tương tác...") */
+.logout-warning-dialog .content.label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}
+
+/* Icon (hình tam giác chấm than) */
+.logout-warning-dialog .header-panel .graphic {
+    /* (Mặc định nó là một ImageView, chúng ta không cần can thiệp) */
+    -fx-padding: 0 10 0 0;
+}
+
+/* Thanh chứa các nút bấm */
+.logout-warning-dialog .button-bar {
+    -fx-background-color: #f0f4f8; /* Màu nền chung */
+    -fx-padding: 15px;
+}
+
+/* Nút OK (đã được thêm class .primary-button từ code Java) */
+.logout-warning-dialog .button {
+    /* Sẽ tự động kế thừa style của .primary-button */
+    -fx-font-size: 14px;
+}
