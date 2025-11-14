@@ -10,14 +10,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
+import java.util.List;
 
 import client.util.NotificationUtil; 
 
@@ -40,26 +44,37 @@ public class TransactionHistoryController {
     @FXML private Label paginationLabel;
     @FXML private Button nextButton;
 
+    @FXML private VBox staffFilterVBox;
+    @FXML private ComboBox<String> staffFilterComboBox;
+
     private GrpcClientService grpcClientService;
     private WarehouseServiceGrpc.WarehouseServiceBlockingStub warehouseStub;
+    private UserManagementServiceGrpc.UserManagementServiceBlockingStub userStub;
 
     private int currentPage = 1;
     private int totalPages = 1;
     private static final int PAGE_SIZE = 10;
     private final DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE;
 
+    private static final String ALL_STAFF = "Tất cả nhân viên";
+
     @FXML
     public void initialize() {
         grpcClientService = GrpcClientService.getInstance();
         warehouseStub = grpcClientService.getWarehouseStub();
+        userStub = grpcClientService.getUserStub();
 
         setupHistoryTable();
 
         startDatePicker.setValue(LocalDate.now().minusMonths(1));
         endDatePicker.setValue(LocalDate.now());
 
-        if (!SessionManager.isManager()) {
+        if (SessionManager.isManager()) {
+            loadStaffList();
+        } else {
             historyTableTitle.setText("Lịch sử Giao dịch của bạn (" + SessionManager.getUsername() + ")");
+            staffFilterVBox.setVisible(false);
+            staffFilterVBox.setManaged(false); 
         }
 
         loadHistory();
@@ -96,6 +111,35 @@ public class TransactionHistoryController {
         }
     }
 
+    private void loadStaffList() {
+        try {
+            GetUsersRequest request = GetUsersRequest.newBuilder()
+                .setPage(1)
+                .setPageSize(1000)
+                .setSearchTerm("")
+                .build();
+
+            UserListResponse response = userStub.getUsers(request);
+            List<UserProfile> users = response.getUsersList();
+            
+            List<String> staffNames = users.stream()
+                                           .map(UserProfile::getUsername) 
+                                           .collect(Collectors.toList());
+
+            ObservableList<String> observableStaffNames = FXCollections.observableArrayList(staffNames);
+            observableStaffNames.add(0, ALL_STAFF); 
+            
+            staffFilterComboBox.setItems(observableStaffNames);
+            staffFilterComboBox.getSelectionModel().selectFirst(); 
+            
+        } catch (Exception e) {
+            System.err.println("Lỗi tải danh sách nhân viên: " + e.getMessage());
+            NotificationUtil.showNotification(filterButton, "Lỗi", "Không thể tải danh sách nhân viên.", AlertType.WARNING);
+            staffFilterComboBox.setItems(FXCollections.observableArrayList(ALL_STAFF));
+            staffFilterComboBox.getSelectionModel().selectFirst();
+        }
+    }
+
     private void loadHistory() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -112,7 +156,12 @@ public class TransactionHistoryController {
                 .setStartDate(startDate.format(isoDateFormatter))
                 .setEndDate(endDate.format(isoDateFormatter));
 
-            if (!SessionManager.isManager()) {
+            if (SessionManager.isManager()) {
+                String selectedStaff = staffFilterComboBox.getValue();
+                if (selectedStaff != null && !selectedStaff.equals(ALL_STAFF)) {
+                    requestBuilder.setUsernameFilter(selectedStaff);
+                }
+            } else {
                 requestBuilder.setUsernameFilter(SessionManager.getUsername());
             }
 

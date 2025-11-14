@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.control.ComboBox?>
 
 <VBox styleClass="root-pane" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.TransactionHistoryController" spacing="15.0">
     <padding>
@@ -25,6 +26,10 @@
             <VBox>
                 <Label styleClass="field-label" text="Đến ngày" />
                 <DatePicker fx:id="endDatePicker" />
+            </VBox>
+            <VBox fx:id="staffFilterVBox">
+                <Label styleClass="field-label" text="Lọc nhân viên" />
+                <ComboBox fx:id="staffFilterComboBox" prefWidth="170.0" />
             </VBox>
             
             <Button fx:id="filterButton" onAction="#handleFilterButton" styleClass="primary-button" text="Lọc / Làm mới" HBox.hgrow="ALWAYS">
