@@ -82,11 +82,11 @@ public class TransactionService {
         for (String productName : productNames) {
             List<Transaction> productTxs = transactionsByProduct.getOrDefault(productName, Collections.emptyList());
             int totalImport = productTxs.stream()
-                    .filter(t -> "IMPORT".equals(t.getAction()))
+                    .filter(t -> "IMPORT".equals(t.getAction()) && t.getResult().equals("SUCCESS"))
                     .mapToInt(Transaction::getQuantity)
                     .sum();
             int totalExport = productTxs.stream()
-                    .filter(t -> "EXPORT".equals(t.getAction()))
+                    .filter(t -> "EXPORT".equals(t.getAction()) && t.getResult().equals("SUCCESS"))
                     .mapToInt(Transaction::getQuantity)
                     .sum();
             int inventory = totalImport - totalExport;

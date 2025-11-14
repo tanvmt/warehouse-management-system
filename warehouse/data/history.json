@@ -150,5 +150,61 @@
     "product": "Tai nghe có dây",
     "quantity": 10,
     "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-11-14T14:36:31.7677867",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 5,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-11-14T14:41:37.2923589",
+    "clientName": "staff_E",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 5,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-11-14T14:41:59.6684254",
+    "clientName": "staff_E",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 5,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-11-14T14:48:43.3163635",
+    "clientName": "staff_E",
+    "action": "EXPORT",
+    "product": "MS-LOGI",
+    "quantity": 30,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 20)"
+  },
+  {
+    "timestamp": "2025-11-14T14:48:48.8536147",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Chuột Logitech",
+    "quantity": 40,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-11-14T14:49:37.2547807",
+    "clientName": "staff_E",
+    "action": "IMPORT",
+    "product": "Chuột Logitech",
+    "quantity": 10,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-11-14T14:49:42.2697758",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "Chuột Logitech",
+    "quantity": 20,
+    "result": "SUCCESS"
   }
 ]

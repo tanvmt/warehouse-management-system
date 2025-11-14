@@ -2,7 +2,7 @@
   {
     "productId": "MS-LOGI",
     "productName": "Chuột Logitech",
-    "quantity": 20,
+    "quantity": 50,
     "isActive": true
   },
   {
@@ -20,7 +20,7 @@
   {
     "productId": "LP-DELL",
     "productName": "Laptop Dell",
-    "quantity": 15,
+    "quantity": 30,
     "isActive": true
   },
   {

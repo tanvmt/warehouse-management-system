@@ -110,6 +110,7 @@ public class ProductService {
 
             if (!product.isActive()) throw new ValidationException("Sản phẩm đang bị vô hiệu hóa: " + productId);
 
+
             product.setQuantity(product.getQuantity() + quantity);
             productRepository.update(product);
 
@@ -142,6 +143,7 @@ public class ProductService {
             if (product.getQuantity() < quantity) {
                 throw new ValidationException("Không đủ hàng trong kho (Còn: " + product.getQuantity() + ")");
             }
+
 
             product.setQuantity(product.getQuantity() - quantity);
             if (!productRepository.update(product)) {
@@ -204,6 +206,7 @@ public class ProductService {
         readLock.lock();
         log.info("Block : get All Products");
         try {
+
             log.info("ProductService/getAllProducts : Return all products");
             return productRepository.getPaginatedProducts(null, true, 1, 1000);
         } finally {
