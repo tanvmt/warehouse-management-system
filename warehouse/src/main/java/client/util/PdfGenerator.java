@@ -97,7 +97,7 @@ public class PdfGenerator {
         int totalProducts = (int) pieChart.getData().stream().filter(d -> d.getPieValue() > 0).count();
         double totalStock = pieChart.getData().stream().mapToDouble(PieChart.Data::getPieValue).sum();
 
-        document.add(new Paragraph("Số liệu tổng quan (Tồn kho Live)")
+        document.add(new Paragraph("Số liệu tổng quan")
                 .setFont(font).setFontSize(14).setBold()
                 .setMarginTop(15));
                 

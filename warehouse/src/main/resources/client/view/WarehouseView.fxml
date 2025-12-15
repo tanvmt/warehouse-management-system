@@ -49,7 +49,7 @@
                
                 <VBox styleClass="card" spacing="10.0">
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label styleClass="card-title" text="Tình trạng Tồn kho (Live)" HBox.hgrow="ALWAYS" />
+                        <Label styleClass="card-title" text="Tình trạng Tồn kho" HBox.hgrow="ALWAYS" />
                         <Button fx:id="refreshButton" onAction="#handleRefresh" styleClass="primary-button" text="Làm mới">
                            <graphic>
                               <FontIcon iconLiteral="fas-sync-alt" />

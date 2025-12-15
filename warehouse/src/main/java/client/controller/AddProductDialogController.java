@@ -11,8 +11,12 @@ import com.group9.warehouse.grpc.AddProductRequest;
 import com.group9.warehouse.grpc.ServiceResponse;
 import com.group9.warehouse.grpc.ProductManagementServiceGrpc;
 
+import com.group9.warehouse.grpc.UpdateProductRequest; 
+import client.model.Product;
+
 public class AddProductDialogController {
 
+    @FXML private Label titleLabel;
     @FXML private TextField productIdField;
     @FXML private TextField productNameField;
     @FXML private Button saveButton;
@@ -22,6 +26,8 @@ public class AddProductDialogController {
     private Stage dialogStage;
     private ProductManagementServiceGrpc.ProductManagementServiceBlockingStub productStub;
     private boolean saved = false;
+
+    private Product productToEdit = null;
 
     @FXML
     public void initialize() {
@@ -39,32 +45,66 @@ public class AddProductDialogController {
         return saved;
     }
 
+    public void setProductToEdit(Product product) {
+        this.productToEdit = product;
+        
+        productIdField.setText(product.getProductId());
+        productNameField.setText(product.getProductName());
+        
+        productIdField.setDisable(true);
+        
+        titleLabel.setText("Chỉnh sửa Sản phẩm");
+        saveButton.setText("Cập nhật");
+    }
+
     @FXML
     private void handleSave() {
         String id = productIdField.getText().trim();
         String name = productNameField.getText().trim();
 
-        if (id.isEmpty() || name.isEmpty()) {
-            showStatus("Lỗi: Mã và Tên không được rỗng.", false);
+        if (name.isEmpty()) {
+            showStatus("Lỗi: Tên không được rỗng.", false);
+            return;
+        }
+        
+        if (id.isEmpty() && productToEdit == null) {
+            showStatus("Lỗi: Mã không được rỗng.", false);
             return;
         }
 
         try {
-            AddProductRequest request = AddProductRequest.newBuilder()
-                    .setProductId(id)
-                    .setProductName(name)
-                    .build();
+            if (productToEdit == null) {
+                AddProductRequest request = AddProductRequest.newBuilder()
+                        .setProductId(id)
+                        .setProductName(name)
+                        .build();
 
-            ServiceResponse response = productStub.addProduct(request);
+                ServiceResponse response = productStub.addProduct(request);
 
-            if (response.getSuccess()) {
-                saved = true;
-                dialogStage.close(); 
+                if (response.getSuccess()) {
+                    saved = true;
+                    dialogStage.close(); 
+                } else {
+                    showStatus("Lỗi thêm sản phẩm: " + response.getMessage(), false);
+                }
             } else {
-                showStatus("Lỗi thêm sản phẩm: " + response.getMessage(), false);
+                UpdateProductRequest request = UpdateProductRequest.newBuilder()
+                        .setProductId(productToEdit.getProductId())
+                        .setNewProductName(name) 
+                        .build();
+                        
+                ServiceResponse response = productStub.updateProduct(request);
+                
+                if (response.getSuccess()) {
+                    saved = true;
+                    dialogStage.close();
+                } else {
+                    showStatus("Lỗi cập nhật sản phẩm: " + response.getMessage(), false);
+                }
             }
         } catch (Exception e) {
-            showStatus("Lỗi gRPC: " + e.getMessage(), false);
+            String action = (productToEdit == null) ? "thêm" : "cập nhật";
+            showStatus("Lỗi gRPC khi " + action + ": " + e.getMessage(), false);
         }
     }
 

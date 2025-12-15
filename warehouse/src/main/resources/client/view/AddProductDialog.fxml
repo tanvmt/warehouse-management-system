@@ -16,7 +16,7 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
     <children>
-        <Label styleClass="card-title" text="Thêm Sản phẩm mới" />
+        <Label fx:id="titleLabel" styleClass="card-title" text="Thêm Sản phẩm mới" />
         <GridPane hgap="10.0" vgap="10.0">
             <Label text="Mã Sản phẩm (ID):" GridPane.columnIndex="0" GridPane.rowIndex="0" />
             <TextField fx:id="productIdField" promptText="ví dụ: MS-LOGI" GridPane.columnIndex="1" GridPane.rowIndex="0" />

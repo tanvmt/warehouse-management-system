@@ -38,6 +38,7 @@ public class ProductManagerController {
     @FXML private TableColumn<Product, Boolean> activeCol;
 
     @FXML private Button showAddProductDialogButton;
+    @FXML private Button editProductButton;
     @FXML private Button setActiveButton;
     @FXML private Button setInactiveButton;
     @FXML private Button prevButton;
@@ -101,9 +102,11 @@ public class ProductManagerController {
 
     private void updateActionButtons(Product selectedProduct) {
         if (selectedProduct == null) {
+            editProductButton.setDisable(true);
             setActiveButton.setDisable(true);
             setInactiveButton.setDisable(true);
         } else {
+            editProductButton.setDisable(false);
             if (selectedProduct.isActive()) {
                 setActiveButton.setDisable(true);
                 setInactiveButton.setDisable(false);
@@ -204,11 +207,53 @@ public class ProductManagerController {
 
             if (controller.isSaved()) {
                 handleRefresh();
+                NotificationUtil.showNotification(productsTable, "Thành công", "Đã thêm sản phẩm mới.", AlertType.INFORMATION);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
             NotificationUtil.showNotification(showAddProductDialogButton, "Lỗi Giao Diện", "Không thể mở biểu mẫu thêm sản phẩm.", AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void handleShowEditProductDialog() {
+        Product selectedProduct = productsTable.getSelectionModel().getSelectedItem();
+        
+        if (selectedProduct == null) {
+            NotificationUtil.showNotification(productsTable, "Chưa chọn sản phẩm", "Vui lòng chọn một sản phẩm để chỉnh sửa.", AlertType.WARNING);
+            return;
+        }
+
+         try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/view/AddProductDialog.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Chỉnh sửa Sản phẩm");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(showAddProductDialogButton.getScene().getWindow());
+            Scene scene = new Scene(page);
+            scene.getStylesheets().add(getClass().getResource("/client/style/main.css").toExternalForm());
+            
+            dialogStage.setScene(scene);
+
+            AddProductDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setProductManagementStub(productStub); 
+            
+            controller.setProductToEdit(selectedProduct);
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaved()) {
+                handleRefresh();
+                NotificationUtil.showNotification(productsTable, "Thành công", "Đã cập nhật sản phẩm.", AlertType.INFORMATION);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            NotificationUtil.showNotification(showAddProductDialogButton, "Lỗi Giao Diện", "Không thể mở biểu mẫu chỉnh sửa.", AlertType.ERROR);
         }
     }
 

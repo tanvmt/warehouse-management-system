@@ -54,6 +54,11 @@
 
             <HBox spacing="10.0" alignment="CENTER_LEFT">
                 <Label text="Hành động với sản phẩm đã chọn:" />
+                <Button fx:id="editProductButton" onAction="#handleShowEditProductDialog" styleClass="primary-button" text="Chỉnh sửa">
+                     <graphic>
+                        <FontIcon iconLiteral="fas-pen" />
+                     </graphic>
+                </Button>
                 <Button fx:id="setActiveButton" onAction="#handleSetActive" styleClass="primary-button" text="Kích hoạt">
                      <graphic>
                         <FontIcon iconLiteral="fas-check-circle" />
