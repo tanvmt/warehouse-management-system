@@ -50,20 +50,15 @@ public class AuthService {
             }
         } catch (StatusRuntimeException e) {
             e.printStackTrace();
-            
-            Status.Code code = e.getStatus().getCode();
-            if (code == Status.Code.INVALID_ARGUMENT || code == Status.Code.UNAUTHENTICATED) {
-                this.errorMessage = "Tên đăng nhập hoặc mật khẩu không đúng.";
-            } else if (code == Status.Code.UNAVAILABLE) {
-                this.errorMessage = "Không thể kết nối đến máy chủ. Vui lòng thử lại.";
-            } else {
-                this.errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại sau.";
-                System.err.println("Lỗi gRPC không xác định: " + e.getStatus());
-            }
+
+            Status status = e.getStatus(); // Lấy đối tượng Status
+            String description = status.getDescription();
+            this.errorMessage = description;
+
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            this.errorMessage = "Đã xảy ra lỗi không xác định: " + e.getMessage();
+            this.errorMessage = "Đã xảy ra lỗi không xác định";
             return false;
         }
     }

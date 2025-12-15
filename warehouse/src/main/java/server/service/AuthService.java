@@ -28,7 +28,7 @@ public class AuthService {
 
     public User validateUser(String username, String plainPassword) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tài khoản không tồn tại"));
 
         if (!user.isActive()) {
             throw new AuthorizationException("Tài khoản đã bị khóa, vui lòng liên hệ Admin");

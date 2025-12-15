@@ -15,7 +15,7 @@ import java.util.List;
 public class ProductDataSource {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String PRODUCTS_FILE = "warehouse/data/products.json";
+    private final String PRODUCTS_FILE = "data/products.json";
     private static final Logger log = LoggerFactory.getLogger(ProductDataSource.class);
 
     public List<Product> loadProducts() {

@@ -20,12 +20,12 @@
   {
     "productId": "LP-DELL",
     "productName": "Laptop Dell",
-    "quantity": 30,
+    "quantity": 90,
     "isActive": true
   },
   {
     "productId": "KB-CO",
-    "productName": "Bàn phím cơ",
+    "productName": "Bàn phím co",
     "quantity": 30,
     "isActive": false
   },
@@ -74,6 +74,12 @@
   {
     "productId": "SN-01",
     "productName": "Màn hình SAMSUNG",
+    "quantity": 0,
+    "isActive": true
+  },
+  {
+    "productId": "TN-100",
+    "productName": "Day sac",
     "quantity": 0,
     "isActive": true
   }

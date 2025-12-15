@@ -3,10 +3,10 @@
     "username": "manager_A",
     "hashedPassword": "$2a$10$uCUQdIUBotUMbS.HshmiY.pSeykYKG1DJQQH.M5a/ZZ7JeLFC3px6",
     "role": "Manager",
-    "fullName": "Trần Văn Quản Lý",
-    "email": "manager_a@company.com",
+    "fullName": "Trần Văn Quản Lýa",
+    "email": "manager_@acompany.com",
     "phone": "0901234567",
-    "sex": "Nữ",
+    "sex": "Nam",
     "dateOfBirth": "1990-05-15",
     "isActive": true
   },
@@ -111,6 +111,17 @@
     "phone": "0374164299",
     "sex": "Nam",
     "dateOfBirth": "2025-11-04",
+    "isActive": true
+  },
+  {
+    "username": "staff_P",
+    "hashedPassword": "$2a$10$KFTCyBfzJZ.tNseTrht.0.OEwlavAJaqftmw6uA7ml3xfYGh3ndga",
+    "role": "Staff",
+    "fullName": "Ngo Van Sa",
+    "email": "sangngo@gmail.com",
+    "phone": "0374164888",
+    "sex": "Nam",
+    "dateOfBirth": "2025-12-03",
     "isActive": true
   }
 ]

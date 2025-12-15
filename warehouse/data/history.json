@@ -206,5 +206,93 @@
     "product": "Chuột Logitech",
     "quantity": 20,
     "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-12-15T23:00:16.6445789",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 10,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-12-16T00:35:20.5230826",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 45,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 40)"
+  },
+  {
+    "timestamp": "2025-12-16T00:45:25.3850256",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 45,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 40)"
+  },
+  {
+    "timestamp": "2025-12-16T00:45:31.9283242",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 45,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 40)"
+  },
+  {
+    "timestamp": "2025-12-16T00:45:52.2552285",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 45,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 40)"
+  },
+  {
+    "timestamp": "2025-12-16T00:49:45.5923966",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 45,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-12-16T00:50:44.3103828",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 90,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 85)"
+  },
+  {
+    "timestamp": "2025-12-16T00:51:50.9423693",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 90,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 85)"
+  },
+  {
+    "timestamp": "2025-12-16T00:52:04.0236894",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 90,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 85)"
+  },
+  {
+    "timestamp": "2025-12-16T00:53:09.9529755",
+    "clientName": "manager_A",
+    "action": "EXPORT",
+    "product": "LP-DELL",
+    "quantity": 90,
+    "result": "FAILED: Không đủ hàng trong kho (Còn: 85)"
+  },
+  {
+    "timestamp": "2025-12-16T01:16:18.6035339",
+    "clientName": "staff_P",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 5,
+    "result": "SUCCESS"
   }
 ]

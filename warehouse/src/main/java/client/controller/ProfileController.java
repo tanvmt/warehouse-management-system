@@ -6,8 +6,10 @@ import client.model.UserProfile;
 
 import com.google.protobuf.Empty;
 import com.google.rpc.context.AttributeContext.Auth;
-import com.group9.warehouse.grpc.*; 
+import com.group9.warehouse.grpc.*;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -131,7 +133,12 @@ public class ProfileController implements Initializable {
                     setStatusLabel(lblInfoStatus, "Cập nhật thất bại: " + response.getMessage(), false);
                 }
 
-            } catch (Exception e) {
+            }catch (StatusRuntimeException e) {
+                Status status = e.getStatus();
+                String description = status.getDescription();
+                setStatusLabel(lblInfoStatus, description , false);
+            }
+            catch (Exception e) {
                 e.printStackTrace();
                 NotificationUtil.showNotification(btnEditSave, "Lỗi", "Lỗi khi cập nhật: " + e.getMessage(), AlertType.ERROR);
             }
@@ -182,7 +189,12 @@ public class ProfileController implements Initializable {
             } else {
                 setStatusLabel(lblPasswordStatus, "Đổi mật khẩu thất bại: " + response.getMessage(), false);
             }
-        } catch (Exception e) {
+        }catch (StatusRuntimeException e) {
+            Status status = e.getStatus();
+            String description = status.getDescription();
+            setStatusLabel(lblPasswordStatus, description , false);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             setStatusLabel(lblPasswordStatus, "Lỗi: " + e.getMessage(), false);
         }

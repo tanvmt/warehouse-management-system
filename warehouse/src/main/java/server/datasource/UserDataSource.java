@@ -17,7 +17,7 @@ public class UserDataSource {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger log = LoggerFactory.getLogger(UserDataSource.class);
-    private final String USERS_FILE = "warehouse/data/users.json";
+    private final String USERS_FILE = "data/users.json";
 
     public List<User> loadUsers() {
         try {

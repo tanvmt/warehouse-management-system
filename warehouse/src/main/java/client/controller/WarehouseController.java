@@ -4,6 +4,8 @@ import client.service.GrpcClientService;
 import client.service.SessionManager;
 import com.group9.warehouse.grpc.*; 
 import client.model.InventoryItem;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -152,16 +154,25 @@ public class WarehouseController {
                 showStatus(logMsg, true);
                 loadInventory();
             } else{
+                System.out.println(response.getMessage());
                 String logMsg = String.format("%s %d %s thất bại: %s\n",
                         actionLog, quantity, selectedProductName, response.getMessage());
                 logTextArea.appendText(logMsg);
                 showStatus(logMsg, false);
             }
             quantityField.clear();
+        }
+        catch (StatusRuntimeException e) {
+            e.printStackTrace();
+            Status status = e.getStatus(); // Lấy đối tượng Status
+            String description = status.getDescription();
+            logTextArea.appendText(description);
+            showStatus(description, false);
         } catch (Exception e) {
-            String errorMsg = "Lỗi giao dịch: " + e.getMessage() + "\n";
-            logTextArea.appendText(errorMsg);
-            showStatus(errorMsg, false);
+            e.printStackTrace();
+            String message = "Đã xảy ra lỗi không xác định";
+            logTextArea.appendText(message);
+            showStatus(message, false);
         }
     }
 

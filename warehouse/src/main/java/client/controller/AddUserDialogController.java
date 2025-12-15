@@ -1,5 +1,7 @@
 package client.controller;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -96,8 +98,14 @@ public class AddUserDialogController {
             } else {
                 showStatus("Lỗi thêm user: " + response.getMessage(), false);
             }
-        } catch (Exception e) {
-            showStatus("Lỗi gRPC: " + e.getMessage(), false);
+        }
+        catch (StatusRuntimeException e) {
+            Status status = e.getStatus();
+            String description = status.getDescription();
+            showStatus(description, false);
+        }
+        catch (Exception e) {
+            showStatus(e.getMessage(), false);
         }
     }
 

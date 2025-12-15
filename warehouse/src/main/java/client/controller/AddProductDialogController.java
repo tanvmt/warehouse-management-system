@@ -1,5 +1,7 @@
 package client.controller;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -102,9 +104,14 @@ public class AddProductDialogController {
                     showStatus("Lỗi cập nhật sản phẩm: " + response.getMessage(), false);
                 }
             }
-        } catch (Exception e) {
-            String action = (productToEdit == null) ? "thêm" : "cập nhật";
-            showStatus("Lỗi gRPC khi " + action + ": " + e.getMessage(), false);
+        }
+        catch (StatusRuntimeException e) {
+            Status status = e.getStatus(); // Lấy đối tượng Status
+            String description = status.getDescription();
+            showStatus(description, false);
+        }
+        catch (Exception e) {
+            showStatus("Đã có lỗi xảy ra!!!", false);
         }
     }
 
