@@ -15,7 +15,7 @@ import java.util.List;
 public class TransactionDataSource {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final String TRANSACTION_FILE = "data/history.json";
+    private final String TRANSACTION_FILE = "warehouse/data/history.json";
     private static final Logger log = LoggerFactory.getLogger(TransactionDataSource.class);
 
     public List<Transaction> loadTransactions() {
