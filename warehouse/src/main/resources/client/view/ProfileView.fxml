@@ -80,7 +80,6 @@
                               <FontIcon iconLiteral="fas-times" />
                            </graphic>
                         </Button>
-                        <Label fx:id="lblInfoStatus" managed="false" styleClass="status-label-error" />
                      </children>
                      <padding>
                         <Insets top="10.0" />
@@ -122,7 +121,6 @@
                               <FontIcon iconLiteral="fas-key" />
                            </graphic>
                         </Button>
-                        <Label fx:id="lblPasswordStatus" managed="false" styleClass="status-label-error" />
                      </children>
                      <padding>
                         <Insets top="10.0" />

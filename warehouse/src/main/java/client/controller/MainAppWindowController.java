@@ -26,11 +26,23 @@ public class MainAppWindowController {
 
     public void loadView(String fxmlPath) {
         try {
-            Node view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Node view = loader.load();
+
+            Object controller = loader.getController();
+            if (controller instanceof ProfileController) {
+                ((ProfileController) controller).setMainAppWindowController(this);
+            }
+            
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
             e.printStackTrace();
             contentArea.getChildren().setAll(new Label("Error loading view: " + e.getMessage()));
         }
+    }
+
+    public void refreshUserInfo(){
+        usernameLabel.setText(SessionManager.getFullName());
+        roleLabel.setText(SessionManager.getRole());
     }
 }

@@ -33,6 +33,7 @@ public class AddProductDialogController {
 
     @FXML
     public void initialize() {
+        statusLabel.setVisible(false);
     }
 
     public void setDialogStage(Stage dialogStage) {
@@ -123,12 +124,15 @@ public class AddProductDialogController {
     private void showStatus(String message, boolean success) {
         Platform.runLater(() -> {
             statusLabel.setText(message);
-            statusLabel.setManaged(true);
+            statusLabel.setVisible(true);
             statusLabel.getStyleClass().removeAll("status-label-success", "status-label-error");
             if (success) {
                 statusLabel.getStyleClass().add("status-label-success");
             } else {
                 statusLabel.getStyleClass().add("status-label-error");
+            }
+            if(dialogStage != null) {
+                dialogStage.sizeToScene();
             }
         });
     }

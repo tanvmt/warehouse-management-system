@@ -35,13 +35,12 @@ public class ProfileController implements Initializable {
     @FXML private DatePicker dpDateOfBirth;
     @FXML private Button btnEditSave;
     @FXML private Button btnCancel;
-    @FXML private Label lblInfoStatus;
 
     @FXML private PasswordField pfOldPassword;
     @FXML private PasswordField pfNewPassword;
     @FXML private PasswordField pfConfirmPassword;
-    @FXML private Label lblPasswordStatus;
 
+    private MainAppWindowController mainAppWindowController;
     private GrpcClientService grpcClientService;
     private AuthServiceGrpc.AuthServiceBlockingStub authStub;
     private UserProfile currentUserProfile;
@@ -92,6 +91,10 @@ public class ProfileController implements Initializable {
         dpDateOfBirth.setValue(profile.getDateOfBirth());
     }
 
+    public void setMainAppWindowController(MainAppWindowController controller) {
+        this.mainAppWindowController = controller;
+    }
+
     
     @FXML
     void handleEditSaveProfile(ActionEvent event) {
@@ -100,7 +103,6 @@ public class ProfileController implements Initializable {
             setFieldsEditable(true);
             btnEditSave.setText("Lưu");
             btnCancel.setVisible(true);
-            lblInfoStatus.setText("");
         } else {
             try {
                 UserProfile updatedProfile = new UserProfile();
@@ -124,19 +126,25 @@ public class ProfileController implements Initializable {
 
                 if (response.getSuccess()) {
                     this.currentUserProfile = updatedProfile;
+                    
+                    SessionManager.setFullName(updatedProfile.getFullName());
+                    if (mainAppWindowController != null) {
+                        mainAppWindowController.refreshUserInfo();
+                    }
+                    
                     isEditing = false;
                     setFieldsEditable(false);
                     btnEditSave.setText("Chỉnh sửa");
                     btnCancel.setVisible(false);
-                    setStatusLabel(lblInfoStatus, "Cập nhật thành công!", true);
+                    NotificationUtil.showNotification(btnEditSave, "Thành công", "Cập nhật thông tin cá nhân thành công!", AlertType.INFORMATION);
                 } else {
-                    setStatusLabel(lblInfoStatus, "Cập nhật thất bại: " + response.getMessage(), false);
+                    NotificationUtil.showNotification(btnEditSave, "Lỗi", "Cập nhật thất bại: " + response.getMessage(), AlertType.ERROR);
                 }
 
             }catch (StatusRuntimeException e) {
                 Status status = e.getStatus();
                 String description = status.getDescription();
-                setStatusLabel(lblInfoStatus, description , false);
+                NotificationUtil.showNotification(btnEditSave, "Lỗi", description, AlertType.ERROR);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -151,7 +159,6 @@ public class ProfileController implements Initializable {
         setFieldsEditable(false);
         btnEditSave.setText("Chỉnh sửa");
         btnCancel.setVisible(false);
-        lblInfoStatus.setText("");
         populateFields(currentUserProfile);
     }
 
@@ -163,11 +170,11 @@ public class ProfileController implements Initializable {
 
         // Validate
         if (oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
-            setStatusLabel(lblPasswordStatus, "Vui lòng nhập đầy đủ các trường!", false);
+            NotificationUtil.showNotification(pfOldPassword, "Lỗi", "Vui lòng nhập đầy đủ các trường!", AlertType.ERROR);
             return;
         }
         if (!newPass.equals(confirmPass)) {
-            setStatusLabel(lblPasswordStatus, "Mật khẩu mới không khớp!", false);
+            NotificationUtil.showNotification(pfNewPassword, "Lỗi", "Mật khẩu mới không khớp!", AlertType.ERROR);
             return;
         }
 
@@ -182,21 +189,21 @@ public class ProfileController implements Initializable {
             ServiceResponse response = authStub.changePassword(request);
 
             if (response.getSuccess()) {
-                setStatusLabel(lblPasswordStatus, "Đổi mật khẩu thành công!", true);
+                NotificationUtil.showNotification(pfOldPassword, "Thành công", "Đổi mật khẩu thành công!", AlertType.INFORMATION);
                 pfOldPassword.clear();
                 pfNewPassword.clear();
                 pfConfirmPassword.clear();
             } else {
-                setStatusLabel(lblPasswordStatus, "Đổi mật khẩu thất bại: " + response.getMessage(), false);
+                NotificationUtil.showNotification(pfOldPassword, "Lỗi", "Đổi mật khẩu thất bại: " + response.getMessage(), AlertType.ERROR);
             }
         }catch (StatusRuntimeException e) {
             Status status = e.getStatus();
             String description = status.getDescription();
-            setStatusLabel(lblPasswordStatus, description , false);
+            NotificationUtil.showNotification(pfOldPassword, "Lỗi", description, AlertType.ERROR);
         }
         catch (Exception e) {
             e.printStackTrace();
-            setStatusLabel(lblPasswordStatus, "Lỗi: " + e.getMessage(), false);
+            NotificationUtil.showNotification(pfOldPassword, "Lỗi", "Lỗi: " + e.getMessage(), AlertType.ERROR);
         }
     }
 
@@ -242,14 +249,5 @@ public class ProfileController implements Initializable {
         tfPhone.setEditable(editable);
         cbSex.setDisable(!editable);
         dpDateOfBirth.setDisable(!editable);
-    }
-    
-    private void setStatusLabel(Label label, String text, boolean isSuccess) {
-        label.setText(text);
-        if (isSuccess) {
-            label.setStyle("-fx-text-fill: green;");
-        } else {
-            label.setStyle("-fx-text-fill: red;");
-        }
     }
 }

@@ -156,6 +156,10 @@ public class SessionManager {
         return authToken;
     }
 
+    public static void setFullName(String name) {
+        fullName = name;
+    }
+
     public static String getFullName() {
         return fullName;
     }

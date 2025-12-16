@@ -198,6 +198,7 @@ public class ProductManagerController {
             scene.getStylesheets().add(getClass().getResource("/client/style/main.css").toExternalForm());
             
             dialogStage.setScene(scene);
+            dialogStage.sizeToScene();
 
             AddProductDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
@@ -237,6 +238,7 @@ public class ProductManagerController {
             scene.getStylesheets().add(getClass().getResource("/client/style/main.css").toExternalForm());
             
             dialogStage.setScene(scene);
+            dialogStage.sizeToScene();
 
             AddProductDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);

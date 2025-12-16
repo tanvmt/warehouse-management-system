@@ -34,7 +34,7 @@
             </rowConstraints>
         </GridPane>
         
-        <Label fx:id="statusLabel" managed="false" styleClass="status-label-error" />
+        <Label fx:id="statusLabel" visible="false" styleClass="status-label-error" />
         
         <HBox spacing="10.0" alignment="CENTER_RIGHT">
             <Button fx:id="saveButton" onAction="#handleSave" styleClass="primary-button" text="Lưu" />
