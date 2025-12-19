@@ -302,5 +302,21 @@
     "product": "Laptop Dell",
     "quantity": 10,
     "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-12-20T01:04:13.9246675",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 10,
+    "result": "SUCCESS"
+  },
+  {
+    "timestamp": "2025-12-20T01:12:09.6220011",
+    "clientName": "manager_A",
+    "action": "IMPORT",
+    "product": "Laptop Dell",
+    "quantity": 5,
+    "result": "SUCCESS"
   }
 ]
