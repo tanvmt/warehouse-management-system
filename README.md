@@ -52,21 +52,19 @@ warehouse-management-system/
 ### 1. Build the Entire System ###
 Since the modules are interdependent (Client and Server rely on Common), you must build and install the project to your local repository first:
 ```
-Bash
+cd warehouse
 # Execute at the project root
 mvn clean install
 ```
 *Note: This step triggers the AspectJ compiler to perform "Weaving" into the server module.*
 ### 2. Run the Server ###
 ```
-Bash
 # Execute from the server module
 cd server
-mvn exec:java -Dexec.mainClass="server.ServerApp"
+mvn exec:java "-Dexec.mainClass=server.ServerApp"
 ```
 ### 3. Run the Client (JavaFX) ###
 ```
-Bash
 # Execute from the client module
 cd client
 mvn javafx:run
