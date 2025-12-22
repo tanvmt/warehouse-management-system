@@ -148,8 +148,8 @@ public class WarehouseController {
             }
 
             if (response.getSuccess()) {
-                String logMsg = String.format("%s %d %s thành công. Tồn kho mới: %d.\n",
-                actionLog, quantity, selectedProductName, response.getNewQuantity());
+                String logMsg = String.format("%s %d %s thành công.\n",
+                actionLog, quantity, selectedProductName);
                 logTextArea.appendText(logMsg);
                 showStatus(logMsg, true);
                 loadInventory();
